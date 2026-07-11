@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Layout as AntLayout } from 'antd'
 import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -9,19 +9,29 @@ const { Content } = AntLayout
 
 export default function AppLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches)
   const location = useLocation()
+  const sidebarCollapsed = isMobile || collapsed
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 767px)')
+    const handleChange = event => setIsMobile(event.matches)
+    query.addEventListener('change', handleChange)
+    return () => query.removeEventListener('change', handleChange)
+  }, [])
 
   return (
     <AntLayout style={{ minHeight: '100vh' }}>
-      <Sidebar collapsed={collapsed} onCollapse={setCollapsed} />
+      <Sidebar collapsed={sidebarCollapsed} onCollapse={setCollapsed} compact={isMobile} />
 
       <AntLayout style={{
-        marginLeft: collapsed ? 80 : 220,
+        marginLeft: sidebarCollapsed ? 64 : 220,
         transition: 'margin-left 0.2s',
+        minWidth: 0,
       }}>
-        <Header />
+        <Header compact={isMobile} />
 
-        <Content style={{ padding: 24, minHeight: 'calc(100vh - 56px)' }}>
+        <Content style={{ padding: isMobile ? 12 : 24, minHeight: 'calc(100vh - 56px)' }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

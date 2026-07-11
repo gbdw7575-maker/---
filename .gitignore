@@ -7,8 +7,10 @@ backend/.env
 # Python
 __pycache__/
 *.py[cod]
+*.h5
 .venv/
 venv/
+.model-tools/
 .pytest_cache/
 .mypy_cache/
 
@@ -24,6 +26,7 @@ backend/start_backend_hidden.vbs
 node_modules/
 frontend/dist/
 .vite/
+backend/training/data/
 
 # Local editor and agent settings
 .claude/settings.local.json

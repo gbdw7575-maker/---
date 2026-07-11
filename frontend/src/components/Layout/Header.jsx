@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 const { Header: AntHeader } = Layout
 
-export default function Header() {
+export default function Header({ compact = false }) {
   const [time, setTime] = useState(new Date())
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function Header() {
       style={{
         height: 56,
         lineHeight: '56px',
-        padding: '0 24px',
+        padding: compact ? '0 12px' : '0 24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',

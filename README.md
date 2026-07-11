@@ -11,6 +11,8 @@ AI 驱动的个人健康管理平台 — OCR 体检报告识别 + 健康数据�
 # 2. 启动后端
 cd backend
 pip install -r requirements.txt
+# 仓库未包含模型时可执行（正常 clone 已自带 10.35 MB ONNX 权重）
+python -m app.classifier.download_model
 uvicorn main:app --reload --port 8000
 ```
 
@@ -117,9 +119,11 @@ D:\code\health\
 ### 医学影像分类
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| POST | `/api/classify/skin` | 皮肤影像分类 |
+| POST | `/api/classify/skin` | 常见皮肤状况图片初筛 |
 | GET | `/api/classify/classes` | 分类类别列表 |
-| GET | `/api/classify/status` | 模型加载状态 |
+| GET | `/api/classify/status` | 模型、许可与运行时状态 |
+
+模型来源、快速训练子集与验收要求见 [皮肤病变模型与训练资源](docs/模型训练资源.md)。
 
 ---
 
@@ -153,7 +157,7 @@ DATABASE_URL=sqlite:///./health.db
 | AI 综合分析 | DeepSeek API Key | ✅ 完成（需配置） |
 | AI 对话咨询 | DeepSeek API Key | ✅ 完成（需配置） |
 | OCR 体检报告识别 | Kimi API Key | ✅ 完成（需配置） |
-| 医学影像分类 | PyTorch + Pillow | ✅ 完成（需权重/依赖） |
+| 皮肤影像初筛 | ONNX Runtime + MobileNetV2 | ✅ 完成（10.35 MB 轻量模型） |
 | 前端界面 | React + Vite + Ant Design | ✅ 完成 |
 | Docker 部署 | — | 📅 规划中 |
 

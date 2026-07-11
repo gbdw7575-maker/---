@@ -23,16 +23,17 @@ const menuItems = [
   { key: '/profile',    icon: <UserOutlined />,               label: '个人档案' },
 ]
 
-export default function Sidebar({ collapsed, onCollapse }) {
+export default function Sidebar({ collapsed, onCollapse, compact = false }) {
   const navigate = useNavigate()
   const location = useLocation()
 
   return (
     <Sider
-      collapsible
+      collapsible={!compact}
       collapsed={collapsed}
       onCollapse={onCollapse}
       width={220}
+      collapsedWidth={64}
       style={{
         borderRight: '1px solid #f0f0f0',
         height: '100vh',
@@ -59,13 +60,13 @@ export default function Sidebar({ collapsed, onCollapse }) {
         <span
           className="gradient-text"
           style={{
-            fontSize: collapsed ? 20 : 18,
+            fontSize: collapsed ? 18 : 18,
             fontWeight: 700,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
           }}
         >
-          {collapsed ? '❤️' : '❤️ 健康管理'}
+          {collapsed ? '♥' : '♥ 健康管理'}
         </span>
       </motion.div>
 

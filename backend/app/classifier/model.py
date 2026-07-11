@@ -1,188 +1,169 @@
-"""
-皮肤病变分类模型 — EfficientNet-B0
+"""Lightweight ONNX classifier for common visible skin conditions.
 
-基于 HAM10000 数据集训练的 7 类皮肤病变分类器。
-支持懒加载模型（首次调用时自动下载预训练权重）。
+This module provides educational screening hints only. It must not be used as
+a medical diagnosis or as a reason to delay professional care.
 """
 
-import os
 import logging
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Any, Optional
+
+import numpy as np
 from PIL import Image
 
 logger = logging.getLogger(__name__)
 
-# 懒加载 torch（可能未安装）
-TORCH_AVAILABLE = False
 try:
-    import torch
-    import torch.nn as nn
-    from torchvision import transforms
-    TORCH_AVAILABLE = True
+    import onnxruntime as ort
+
+    ONNX_AVAILABLE = True
 except ImportError:
-    torch = None
-    nn = None
-    transforms = None
+    ort = None
+    ONNX_AVAILABLE = False
 
-logger = logging.getLogger(__name__)
 
-# HAM10000 数据集 7 类病变
-CLASS_NAMES = [
-    "良性角化病 (BKL)",         # Benign keratosis
-    "基底细胞癌 (BCC)",         # Basal cell carcinoma
-    "光化性角化病 (AKIEC)",     # Actinic keratosis
-    "黑色素瘤 (MEL)",           # Melanoma
-    "痣 (NV)",                  # Melanocytic nevus
-    "血管病变 (VASC)",          # Vascular lesion
-    "皮肤纤维瘤 (DF)",          # Dermatofibroma
-]
-
-CLASS_SHORT = ["BKL", "BCC", "AKIEC", "MEL", "NV", "VASC", "DF"]
-
-CLASS_DESCRIPTIONS = {
-    "BKL": "良性角化病，一种常见的良性皮肤增生，通常无需治疗",
-    "BCC": "基底细胞癌，最常见的皮肤癌类型，早期治疗预后良好",
-    "AKIEC": "光化性角化病，癌前病变，部分可能发展为鳞状细胞癌",
-    "MEL": "黑色素瘤，最危险的皮肤癌，需立即就医",
-    "NV": "良性痣，通常 harmless，但需定期观察变化",
-    "VASC": "血管病变，多为良性，如血管瘤",
-    "DF": "皮肤纤维瘤，良性纤维组织增生",
-}
-
-# 模型保存路径
+MODEL_NAME = "MobileNetV2 Common Skin Conditions"
+MODEL_VERSION = "1.0"
+MODEL_SOURCE = "Zeynepcklc/skin-mobilenetv2"
+MODEL_LICENSE = "MIT"
+MODEL_SHA256 = "f68630720ea3afb2aff40557b091887006ad40c53b6f906674fd56bb30014374"
 MODEL_DIR = Path(__file__).resolve().parent / "weights"
-MODEL_PATH = MODEL_DIR / "efficientnet_b0_ham10000.pth"
+MODEL_PATH = MODEL_DIR / "skin_disease_mobilenetv2.onnx"
 
-# 下载 URL（如果使用在线权重）
-MODEL_URL = "https://github.com/your-org/health-models/releases/download/v1.0/efficientnet_b0_ham10000.pth"
+CLASS_SHORT = ["AD", "BCC", "ECZEMA", "MEL", "WARTS"]
+CLASS_NAMES = [
+    "特应性皮炎",
+    "基底细胞癌",
+    "湿疹",
+    "黑色素瘤",
+    "疣或传染性软疣",
+]
+CLASS_DESCRIPTIONS = {
+    "AD": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+    "BCC": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+    "ECZEMA": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+    "MEL": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+    "WARTS": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+}
+CLASS_RISK = {
+    "AD": "routine",
+    "BCC": "urgent",
+    "ECZEMA": "routine",
+    "MEL": "urgent",
+    "WARTS": "routine",
+}
 
 
 class SkinClassifier:
-    """皮肤病变分类器"""
+    """Run the five-class MobileNetV2 model with ONNX Runtime on CPU."""
 
     def __init__(self, model_path: Optional[str] = None):
-        self.model_path = model_path or str(MODEL_PATH)
+        self.model_path = str(model_path or MODEL_PATH)
         self.device = "cpu"
         self.model = None
-        self.transform = None
-
-        if TORCH_AVAILABLE:
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            self.transform = transforms.Compose([
-                transforms.Resize((224, 224)),
-                transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406],
-                    std=[0.229, 0.224, 0.225],
-                ),
-            ])
+        self.input_name: Optional[str] = None
+        self.output_name: Optional[str] = None
 
     def load_model(self) -> bool:
-        """加载模型权重。返回 True 表示加载成功。"""
         if self.model is not None:
             return True
-
-        if not TORCH_AVAILABLE:
-            logger.warning("PyTorch 未安装，无法加载模型")
-            logger.info("请安装 PyTorch: pip install torch torchvision")
+        if not ONNX_AVAILABLE:
+            logger.warning("onnxruntime is not installed")
             return False
-
-        if not os.path.exists(self.model_path):
-            logger.warning(f"模型文件不存在: {self.model_path}")
-            logger.info("请先运行 python -m app.classifier.download_model --real")
+        if not Path(self.model_path).is_file():
+            logger.warning("Model file does not exist: %s", self.model_path)
             return False
 
         try:
-            from torchvision.models import efficientnet_b0
-
-            # 创建模型结构
-            self.model = efficientnet_b0(weights=None)
-            num_features = self.model.classifier[1].in_features
-            self.model.classifier[1] = nn.Linear(num_features, 7)
-
-            # 加载权重
-            state_dict = torch.load(self.model_path, map_location=self.device)
-            self.model.load_state_dict(state_dict)
-            self.model.to(self.device)
-            self.model.eval()
-
-            logger.info(f"模型加载成功 (设备: {self.device})")
+            options = ort.SessionOptions()
+            options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            self.model = ort.InferenceSession(
+                self.model_path,
+                sess_options=options,
+                providers=["CPUExecutionProvider"],
+            )
+            self.input_name = self.model.get_inputs()[0].name
+            self.output_name = self.model.get_outputs()[0].name
             return True
-
-        except Exception as e:
-            logger.error(f"模型加载失败: {e}")
+        except Exception as exc:
+            logger.exception("Failed to load skin classifier: %s", exc)
+            self.model = None
             return False
 
-    def predict(self, image: Image.Image, topk: int = 3) -> Dict[str, Any]:
-        """
-        对单张图片进行分类预测。
+    @staticmethod
+    def _preprocess(image: Image.Image) -> np.ndarray:
+        resized = image.convert("RGB").resize((224, 224), Image.Resampling.BILINEAR)
+        array = np.asarray(resized, dtype=np.float32)
+        array = array / 127.5 - 1.0
+        return np.expand_dims(array, axis=0)
 
-        Args:
-            image: PIL Image 对象
-            topk: 返回前 k 个预测结果
+    @staticmethod
+    def _normalize_output(values: np.ndarray) -> np.ndarray:
+        probabilities = np.asarray(values, dtype=np.float32).reshape(-1)
+        if len(probabilities) != len(CLASS_NAMES):
+            raise ValueError("模型输出类别数量不正确")
+        if np.any(probabilities < 0) or not np.isclose(probabilities.sum(), 1.0, atol=0.01):
+            shifted = probabilities - probabilities.max()
+            probabilities = np.exp(shifted) / np.exp(shifted).sum()
+        return probabilities
 
-        Returns:
-            {
-                "success": bool,
-                "predictions": [
-                    {"class_name": str, "class_short": str, "probability": float, "description": str},
-                    ...
-                ],
-                "error": str | None
-            }
-        """
-        if self.model is None:
-            loaded = self.load_model()
-            if not loaded:
-                return {
-                    "success": False,
-                    "predictions": [],
-                    "error": "模型未加载，请先下载预训练权重",
-                }
-
-        try:
-            # 预处理
-            img_tensor = self.transform(image).unsqueeze(0).to(self.device)
-
-            # 推理
-            outputs = self.model(img_tensor)
-            probabilities = torch.softmax(outputs, dim=1)[0]
-
-            # 取 top-k
-            top_probs, top_indices = torch.topk(probabilities, min(topk, len(CLASS_NAMES)))
-
-            predictions = []
-            for prob, idx in zip(top_probs.tolist(), top_indices.tolist()):
-                short = CLASS_SHORT[idx]
-                predictions.append({
-                    "class_name": CLASS_NAMES[idx],
-                    "class_short": short,
-                    "probability": round(prob, 4),
-                    "description": CLASS_DESCRIPTIONS.get(short, ""),
-                })
-
-            return {
-                "success": True,
-                "predictions": predictions,
-                "error": None,
-            }
-
-        except Exception as e:
-            logger.error(f"预测失败: {e}")
+    def predict(self, image: Image.Image, topk: int = 3) -> dict[str, Any]:
+        if not self.load_model():
             return {
                 "success": False,
                 "predictions": [],
-                "error": str(e),
+                "uncertain": True,
+                "notice": "分类模型尚未安装，请运行模型下载脚本并安装 onnxruntime。",
+                "error": "模型不可用",
+            }
+
+        try:
+            tensor = self._preprocess(image)
+            raw = self.model.run([self.output_name], {self.input_name: tensor})[0]
+            probabilities = self._normalize_output(raw[0])
+            indices = np.argsort(probabilities)[::-1][: min(topk, len(CLASS_NAMES))]
+            predictions = []
+            for index in indices:
+                short = CLASS_SHORT[int(index)]
+                predictions.append(
+                    {
+                        "class_name": CLASS_NAMES[int(index)],
+                        "class_short": short,
+                        "probability": round(float(probabilities[index]), 4),
+                        "description": CLASS_DESCRIPTIONS[short],
+                        "risk_level": CLASS_RISK[short],
+                    }
+                )
+
+            top_probability = predictions[0]["probability"]
+            uncertain = top_probability < 0.60
+            notice = (
+                "图片与模型已知类别的匹配度较低，请勿依据本结果自行用药。"
+                if uncertain
+                else "结果仅表示图像相似度，不构成医疗诊断。"
+            )
+            return {
+                "success": True,
+                "predictions": predictions,
+                "uncertain": uncertain,
+                "notice": notice,
+                "error": None,
+            }
+        except Exception as exc:
+            logger.exception("Skin classification failed: %s", exc)
+            return {
+                "success": False,
+                "predictions": [],
+                "uncertain": True,
+                "notice": "无法完成图片初筛，请稍后重试或咨询医生。",
+                "error": str(exc),
             }
 
 
-# 全局单例
 _classifier: Optional[SkinClassifier] = None
 
 
 def get_classifier() -> SkinClassifier:
-    """获取全局分类器实例"""
     global _classifier
     if _classifier is None:
         _classifier = SkinClassifier()

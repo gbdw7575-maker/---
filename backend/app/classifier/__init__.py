@@ -1,9 +1,5 @@
-"""
-医学影像分类模块
+"""Lightweight common skin-condition image screening."""
 
-基于 EfficientNet-B0 的皮肤病变分类。
-"""
+from .model import SkinClassifier, get_classifier
 
-from .model import SkinClassifier
-
-__all__ = ["SkinClassifier"]
+__all__ = ["SkinClassifier", "get_classifier"]
