@@ -1,0 +1,37 @@
+:root {
+  /* Colors */
+  --primary: #1677ff;
+  --primary-light: #e6f4ff;
+  --success: #52c41a;
+  --warning: #faad14;
+  --danger: #ff4d4f;
+  --info: #1677ff;
+
+  /* Risk colors */
+  --risk-low: #52c41a;
+  --risk-medium: #faad14;
+  --risk-high: #ff4d4f;
+
+  /* Status colors */
+  --status-normal: #52c41a;
+  --status-abnormal-high: #ff4d4f;
+  --status-abnormal-low: #faad14;
+
+  /* Neutrals */
+  --bg-primary: #f5f7fa;
+  --bg-card: #ffffff;
+  --text-primary: #1f1f1f;
+  --text-secondary: #666;
+  --text-tertiary: #999;
+  --border: #e8e8e8;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 20px rgba(22, 119, 255, 0.15);
+
+  /* Sizes */
+  --sidebar-width: 240px;
+  --header-height: 64px;
+}

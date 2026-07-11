@@ -1,0 +1,36 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+backend/.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Local databases and runtime files
+*.db
+*.db-shm
+*.db-wal
+*.log
+*.err
+backend/start_backend_hidden.vbs
+
+# Node / Vite
+node_modules/
+frontend/dist/
+.vite/
+
+# Local editor and agent settings
+.claude/settings.local.json
+.agents/
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
