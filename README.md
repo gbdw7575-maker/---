@@ -11,7 +11,7 @@ AI 驱动的个人健康管理平台 — OCR 体检报告识别 + 健康数据�
 # 2. 启动后端
 cd backend
 pip install -r requirements.txt
-# 仓库未包含模型时可执行（正常 clone 已自带 10.35 MB ONNX 权重）
+# 模型缺失或损坏时可从当前 Git 提交恢复（正常 clone 已自带权重）
 python -m app.classifier.download_model
 uvicorn main:app --reload --port 8000
 ```
