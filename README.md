@@ -113,7 +113,7 @@ health/
 |------|-----|
 | 地址 | `localhost:3306` |
 | 数据库 | `health` |
-| 用户 / 密码 | `root` / `root` |
+| 用户 / 密码 | |
 
 ### `backend/.env`
 
