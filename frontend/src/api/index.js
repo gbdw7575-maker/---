@@ -21,10 +21,12 @@ export const healthApi = {
   get: (id) => api.get(`/health/indicators/${id}`),
   update: (id, data) => api.put(`/health/indicators/${id}`, data),
   delete: (id) => api.delete(`/health/indicators/${id}`),
+  batchDelete: (ids) => api.delete('/health/indicators/batch', { data: { ids } }),
   categories: () => api.get('/health/categories'),
   riskSummary: (params) => api.get('/health/risk-summary', { params }),
   suggestions: (params) => api.get('/health/suggestions', { params }),
-  aiAnalyze: (params) => api.post('/health/ai-analyze', null, { params }),
+  aiAnalyze: (params) => api.post('/health/ai-analyze', null, { params, timeout: 120000 }),
+  aiAnalyses: (params) => api.get('/health/ai-analyses', { params }),
 }
 
 // ── Chat ──
@@ -34,12 +36,12 @@ export const chatApi = {
   getSession: (id) => api.get(`/chat/sessions/${id}`),
   deleteSession: (id) => api.delete(`/chat/sessions/${id}`),
   listMessages: (sessionId) => api.get(`/chat/sessions/${sessionId}/messages`),
-  send: (data) => api.post('/chat/send', data),
+  send: (data) => api.post('/chat/send', data, { timeout: 120000 }),
 }
 
 // ── OCR ──
 export const ocrApi = {
-  recognize: (data, params) => api.post('/ocr/recognize', data, { params }),
+  recognize: (data, params) => api.post('/ocr/recognize', data, { params, timeout: 120000 }),
 }
 
 // ── Medical Image Classification ──

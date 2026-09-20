@@ -1,0 +1,1179 @@
+{
+  "dataset": "raghad-murad/clinical-skin-disease-images",
+  "selection": "Category directory plus disease-specific filename",
+  "requested_per_class": 3,
+  "downloaded_per_class": {
+    "AD": 3,
+    "BCC": 3,
+    "ECZEMA": 3,
+    "MEL": 3,
+    "WARTS": 3
+  },
+  "local_model": {
+    "count": 15,
+    "top1_correct": 4,
+    "top1_accuracy": 0.2667,
+    "top3_correct": 13,
+    "top3_accuracy": 0.8667,
+    "by_class": {
+      "AD": {
+        "count": 3,
+        "top1_correct": 0,
+        "top3_correct": 3,
+        "predicted_top1": {
+          "WARTS": 2,
+          "ECZEMA": 1
+        }
+      },
+      "BCC": {
+        "count": 3,
+        "top1_correct": 0,
+        "top3_correct": 3,
+        "predicted_top1": {
+          "ECZEMA": 3
+        }
+      },
+      "ECZEMA": {
+        "count": 3,
+        "top1_correct": 1,
+        "top3_correct": 3,
+        "predicted_top1": {
+          "ECZEMA": 1,
+          "AD": 2
+        }
+      },
+      "MEL": {
+        "count": 3,
+        "top1_correct": 2,
+        "top3_correct": 2,
+        "predicted_top1": {
+          "MEL": 2,
+          "ECZEMA": 1
+        }
+      },
+      "WARTS": {
+        "count": 3,
+        "top1_correct": 1,
+        "top3_correct": 2,
+        "predicted_top1": {
+          "WARTS": 1,
+          "AD": 2
+        }
+      }
+    }
+  },
+  "samples": [
+    {
+      "row_index": 0,
+      "case_id": "Atopic Dermatitis/DER_05ATopicAreola.jpg",
+      "label": "AD",
+      "label_confidence": "directory_and_filename",
+      "expected": "AD",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\AD_0.jpg",
+      "predictions": [
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.6724,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.2598,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.0352,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.0269,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0057,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "WARTS",
+      "top3": [
+        "WARTS",
+        "AD",
+        "ECZEMA"
+      ],
+      "top1_probability": 0.6724,
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "row_index": 1,
+      "case_id": "Atopic Dermatitis/DER_05Atopic.jpg",
+      "label": "AD",
+      "label_confidence": "directory_and_filename",
+      "expected": "AD",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\AD_1.jpg",
+      "predictions": [
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.7605,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.2061,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0318,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0009,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.0007,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "ECZEMA",
+      "top3": [
+        "ECZEMA",
+        "AD",
+        "WARTS"
+      ],
+      "top1_probability": 0.7605,
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "row_index": 2,
+      "case_id": "Atopic Dermatitis/DER_05Atopic010203.jpg",
+      "label": "AD",
+      "label_confidence": "directory_and_filename",
+      "expected": "AD",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\AD_2.jpg",
+      "predictions": [
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.5472,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.3202,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.0924,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.0322,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0079,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "WARTS",
+      "top3": [
+        "WARTS",
+        "ECZEMA",
+        "AD"
+      ],
+      "top1_probability": 0.5472,
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "row_index": 0,
+      "case_id": "Basal Cell Carcinoma/PAD_PAT_101_1041_651.jpg",
+      "label": "BCC",
+      "label_confidence": "directory_and_filename",
+      "expected": "BCC",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\BCC_0.jpg",
+      "predictions": [
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.5569,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.2721,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.1059,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.055,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0101,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "ECZEMA",
+      "top3": [
+        "ECZEMA",
+        "AD",
+        "BCC"
+      ],
+      "top1_probability": 0.5569,
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "row_index": 1,
+      "case_id": "Basal Cell Carcinoma/PAD_PAT_101_1041_658.jpg",
+      "label": "BCC",
+      "label_confidence": "directory_and_filename",
+      "expected": "BCC",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\BCC_1.jpg",
+      "predictions": [
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.7201,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.2267,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.0291,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.0136,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0105,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "ECZEMA",
+      "top3": [
+        "ECZEMA",
+        "BCC",
+        "AD"
+      ],
+      "top1_probability": 0.7201,
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "row_index": 2,
+      "case_id": "Basal Cell Carcinoma/PAD_PAT_101_1041_898.jpg",
+      "label": "BCC",
+      "label_confidence": "directory_and_filename",
+      "expected": "BCC",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\BCC_2.jpg",
+      "predictions": [
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.8069,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.1832,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0064,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0027,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.0008,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "ECZEMA",
+      "top3": [
+        "ECZEMA",
+        "AD",
+        "BCC"
+      ],
+      "top1_probability": 0.8069,
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "row_index": 0,
+      "case_id": "Eczema/DER_03Eczema0915.jpg",
+      "label": "ECZEMA",
+      "label_confidence": "directory_and_filename",
+      "expected": "ECZEMA",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\ECZEMA_0.jpg",
+      "predictions": [
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.8232,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.1102,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0344,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.0239,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0083,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "ECZEMA",
+      "top3": [
+        "ECZEMA",
+        "AD",
+        "WARTS"
+      ],
+      "top1_probability": 0.8232,
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "row_index": 1,
+      "case_id": "Eczema/DER_03EczemaExcoriated.jpg",
+      "label": "ECZEMA",
+      "label_confidence": "directory_and_filename",
+      "expected": "ECZEMA",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\ECZEMA_1.jpg",
+      "predictions": [
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.8537,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.1343,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0094,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0018,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.0008,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "AD",
+      "top3": [
+        "AD",
+        "ECZEMA",
+        "WARTS"
+      ],
+      "top1_probability": 0.8537,
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "row_index": 2,
+      "case_id": "Eczema/DER_03EczemaExcoriated011204.jpg",
+      "label": "ECZEMA",
+      "label_confidence": "directory_and_filename",
+      "expected": "ECZEMA",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\ECZEMA_2.jpg",
+      "predictions": [
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.7307,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.2378,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0223,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0072,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.002,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "AD",
+      "top3": [
+        "AD",
+        "ECZEMA",
+        "WARTS"
+      ],
+      "top1_probability": 0.7307,
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "row_index": 0,
+      "case_id": "Melanoma and Nevi/DER_malignant-melanoma-1.jpg",
+      "label": "MEL",
+      "label_confidence": "directory_and_filename",
+      "expected": "MEL",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\MEL_0.jpg",
+      "predictions": [
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.931,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.0289,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.0167,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0144,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.009,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "MEL",
+      "top3": [
+        "MEL",
+        "AD",
+        "ECZEMA"
+      ],
+      "top1_probability": 0.931,
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "row_index": 1,
+      "case_id": "Melanoma and Nevi/DER_malignant-melanoma-10.jpg",
+      "label": "MEL",
+      "label_confidence": "directory_and_filename",
+      "expected": "MEL",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\MEL_1.jpg",
+      "predictions": [
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.7944,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.1037,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0457,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.0397,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0165,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "MEL",
+      "top3": [
+        "MEL",
+        "ECZEMA",
+        "WARTS"
+      ],
+      "top1_probability": 0.7944,
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "row_index": 2,
+      "case_id": "Melanoma and Nevi/DER_malignant-melanoma-100.jpg",
+      "label": "MEL",
+      "label_confidence": "directory_and_filename",
+      "expected": "MEL",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\MEL_2.jpg",
+      "predictions": [
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.8448,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.0692,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0361,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.0283,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0216,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "ECZEMA",
+      "top3": [
+        "ECZEMA",
+        "AD",
+        "BCC"
+      ],
+      "top1_probability": 0.8448,
+      "top1_correct": false,
+      "top3_correct": false
+    },
+    {
+      "row_index": 0,
+      "case_id": "Viral Infections/DER_12WartAldara.jpg",
+      "label": "WARTS",
+      "label_confidence": "directory_and_filename",
+      "expected": "WARTS",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\WARTS_0.jpg",
+      "predictions": [
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.5448,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.3091,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.1054,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.028,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0128,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "WARTS",
+      "top3": [
+        "WARTS",
+        "AD",
+        "ECZEMA"
+      ],
+      "top1_probability": 0.5448,
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "row_index": 1,
+      "case_id": "Viral Infections/DER_12WartNitrogen1.jpg",
+      "label": "WARTS",
+      "label_confidence": "directory_and_filename",
+      "expected": "WARTS",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\WARTS_1.jpg",
+      "predictions": [
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.5787,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.1789,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.1107,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.0933,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.0384,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "AD",
+      "top3": [
+        "AD",
+        "BCC",
+        "MEL"
+      ],
+      "top1_probability": 0.5787,
+      "top1_correct": false,
+      "top3_correct": false
+    },
+    {
+      "row_index": 2,
+      "case_id": "Viral Infections/DER_12WartPeriungual.jpg",
+      "label": "WARTS",
+      "label_confidence": "directory_and_filename",
+      "expected": "WARTS",
+      "path": "D:\\code\\health\\backend\\evaluation\\skin_online\\images\\WARTS_2.jpg",
+      "predictions": [
+        {
+          "class_name": "特应性皮炎",
+          "class_short": "AD",
+          "probability": 0.4137,
+          "description": "常见慢性炎症性皮肤问题，可表现为干燥、发红和瘙痒，需要结合病史判断。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "湿疹",
+          "class_short": "ECZEMA",
+          "probability": 0.4087,
+          "description": "常见炎症性皮肤表现，可能与刺激、过敏或皮肤屏障受损有关。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "疣或传染性软疣",
+          "class_short": "WARTS",
+          "probability": 0.1522,
+          "description": "可能与疣或传染性软疣的外观相似，部分具有传染性，应避免抓挠和共用毛巾。",
+          "risk_level": "routine",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "基底细胞癌",
+          "class_short": "BCC",
+          "probability": 0.0162,
+          "description": "模型发现与基底细胞癌训练样本相似的特征，建议尽快由皮肤科医生面诊确认。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        },
+        {
+          "class_name": "黑色素瘤",
+          "class_short": "MEL",
+          "probability": 0.0091,
+          "description": "模型发现与黑色素瘤训练样本相似的特征，请尽快到皮肤科进行专业评估。",
+          "risk_level": "urgent",
+          "provider": "local_model"
+        }
+      ],
+      "top1": "AD",
+      "top3": [
+        "AD",
+        "ECZEMA",
+        "WARTS"
+      ],
+      "top1_probability": 0.4137,
+      "top1_correct": false,
+      "top3_correct": true
+    }
+  ],
+  "vision_ai": {
+    "count": 5,
+    "top1_correct": 3,
+    "top1_accuracy": 0.6,
+    "top3_correct": 3,
+    "top3_accuracy": 0.6,
+    "by_class": {
+      "AD": {
+        "count": 1,
+        "top1_correct": 0,
+        "top3_correct": 0,
+        "predicted_top1": {
+          "WARTS": 1
+        }
+      },
+      "BCC": {
+        "count": 1,
+        "top1_correct": 1,
+        "top3_correct": 1,
+        "predicted_top1": {
+          "BCC": 1
+        }
+      },
+      "ECZEMA": {
+        "count": 1,
+        "top1_correct": 0,
+        "top3_correct": 0,
+        "predicted_top1": {
+          "NV": 1
+        }
+      },
+      "MEL": {
+        "count": 1,
+        "top1_correct": 1,
+        "top3_correct": 1,
+        "predicted_top1": {
+          "MEL": 1
+        }
+      },
+      "WARTS": {
+        "count": 1,
+        "top1_correct": 1,
+        "top3_correct": 1,
+        "predicted_top1": {
+          "WARTS": 1
+        }
+      }
+    }
+  },
+  "vision_ai_samples": [
+    {
+      "expected": "AD",
+      "row_index": 0,
+      "top1": "WARTS",
+      "top3": [
+        "WARTS",
+        "ACNE",
+        "ECZEMA"
+      ],
+      "top1_correct": false,
+      "top3_correct": false
+    },
+    {
+      "expected": "BCC",
+      "row_index": 0,
+      "top1": "BCC",
+      "top3": [
+        "BCC",
+        "SCC",
+        "AK"
+      ],
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "expected": "ECZEMA",
+      "row_index": 0,
+      "top1": "NV",
+      "top3": [
+        "NV",
+        "DF",
+        "ACNE"
+      ],
+      "top1_correct": false,
+      "top3_correct": false
+    },
+    {
+      "expected": "MEL",
+      "row_index": 0,
+      "top1": "MEL",
+      "top3": [
+        "MEL",
+        "BCC",
+        "AK"
+      ],
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "expected": "WARTS",
+      "row_index": 0,
+      "top1": "WARTS",
+      "top3": [
+        "WARTS",
+        "AK",
+        "SCC"
+      ],
+      "top1_correct": true,
+      "top3_correct": true
+    }
+  ],
+  "hybrid": {
+    "count": 5,
+    "top1_correct": 3,
+    "top1_accuracy": 0.6,
+    "top3_correct": 4,
+    "top3_accuracy": 0.8,
+    "by_class": {
+      "AD": {
+        "count": 1,
+        "top1_correct": 0,
+        "top3_correct": 0,
+        "predicted_top1": {
+          "WARTS": 1
+        }
+      },
+      "BCC": {
+        "count": 1,
+        "top1_correct": 0,
+        "top3_correct": 1,
+        "predicted_top1": {
+          "ECZEMA": 1
+        }
+      },
+      "ECZEMA": {
+        "count": 1,
+        "top1_correct": 1,
+        "top3_correct": 1,
+        "predicted_top1": {
+          "ECZEMA": 1
+        }
+      },
+      "MEL": {
+        "count": 1,
+        "top1_correct": 1,
+        "top3_correct": 1,
+        "predicted_top1": {
+          "MEL": 1
+        }
+      },
+      "WARTS": {
+        "count": 1,
+        "top1_correct": 1,
+        "top3_correct": 1,
+        "predicted_top1": {
+          "WARTS": 1
+        }
+      }
+    }
+  },
+  "hybrid_samples": [
+    {
+      "expected": "AD",
+      "row_index": 0,
+      "top1": "WARTS",
+      "top3": [
+        "WARTS",
+        "ACNE",
+        "ECZEMA"
+      ],
+      "strategy": "broader_vision",
+      "top1_correct": false,
+      "top3_correct": false
+    },
+    {
+      "expected": "BCC",
+      "row_index": 0,
+      "top1": "ECZEMA",
+      "top3": [
+        "ECZEMA",
+        "AD",
+        "BCC"
+      ],
+      "strategy": "local_fallback",
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "expected": "ECZEMA",
+      "row_index": 0,
+      "top1": "ECZEMA",
+      "top3": [
+        "ECZEMA",
+        "AD",
+        "WARTS"
+      ],
+      "strategy": "confident_local",
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "expected": "MEL",
+      "row_index": 0,
+      "top1": "MEL",
+      "top3": [
+        "MEL",
+        "BCC",
+        "AK"
+      ],
+      "strategy": "urgent_vision",
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "expected": "WARTS",
+      "row_index": 0,
+      "top1": "WARTS",
+      "top3": [
+        "WARTS",
+        "AK",
+        "SCC"
+      ],
+      "strategy": "broader_vision",
+      "top1_correct": true,
+      "top3_correct": true
+    }
+  ]
+}

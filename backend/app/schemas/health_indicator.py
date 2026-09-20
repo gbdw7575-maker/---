@@ -11,6 +11,9 @@ class HealthIndicatorCreate(BaseModel):
     category: str = Field(..., max_length=30, description="分类")
     name: str = Field(..., max_length=50, description="指标名称")
     value: str = Field(..., max_length=50, description="检测值")
+    statistic_type: Optional[str] = Field(None, max_length=20)
+    reference_min: Optional[float] = None
+    reference_max: Optional[float] = None
     unit: Optional[str] = Field(None, max_length=20, description="单位")
     normal_range: Optional[str] = Field(None, max_length=100, description="正常范围")
     status: Optional[str] = Field(None, max_length=20, description="状态")
@@ -24,6 +27,9 @@ class HealthIndicatorUpdate(BaseModel):
     category: Optional[str] = Field(None, max_length=30)
     name: Optional[str] = Field(None, max_length=50)
     value: Optional[str] = Field(None, max_length=50)
+    statistic_type: Optional[str] = Field(None, max_length=20)
+    reference_min: Optional[float] = None
+    reference_max: Optional[float] = None
     unit: Optional[str] = Field(None, max_length=20)
     normal_range: Optional[str] = Field(None, max_length=100)
     status: Optional[str] = Field(None, max_length=20)
@@ -38,6 +44,9 @@ class HealthIndicatorResponse(BaseModel):
     category: str
     name: str
     value: str
+    statistic_type: Optional[str] = None
+    reference_min: Optional[float] = None
+    reference_max: Optional[float] = None
     unit: Optional[str] = None
     normal_range: Optional[str] = None
     status: Optional[str] = None
@@ -52,3 +61,7 @@ class HealthIndicatorResponse(BaseModel):
 
 class HealthIndicatorBatchCreate(BaseModel):
     indicators: List[HealthIndicatorCreate]
+
+
+class HealthIndicatorBatchDelete(BaseModel):
+    ids: List[int] = Field(..., min_length=1, max_length=500)

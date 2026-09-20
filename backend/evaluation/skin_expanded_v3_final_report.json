@@ -1,0 +1,61 @@
+{
+  "date": "2026-07-19",
+  "inference": "local_only_onnx_ensemble",
+  "classes": ["ACNE", "AK", "AD", "BACT", "BCC", "CONTACT", "ECZEMA", "FUNGAL", "HERPES", "MEL", "PSO", "SEK", "SCC", "URT", "WARTS"],
+  "dataset": {
+    "downloaded_candidates": 5325,
+    "deduplicated_images": 5062,
+    "train": 3546,
+    "validation": 756,
+    "test": 760,
+    "corrupt_images": 0,
+    "split_note": "PAD is patient-grouped; sources without patient identifiers are image-grouped."
+  },
+  "deployed_ensemble": {
+    "efficientnet_weight": 0.9,
+    "mobilenet_v3_weight": 0.1,
+    "top1": 0.5355263158,
+    "top3": 0.8013157895,
+    "macro_recall": 0.5327712722,
+    "macro_top3": 0.8071694117,
+    "class_recall": {
+      "ACNE": 0.75,
+      "AK": 0.7,
+      "AD": 0.6181818182,
+      "BACT": 0.4615384615,
+      "BCC": 0.6833333333,
+      "CONTACT": 0.3191489362,
+      "ECZEMA": 0.3859649123,
+      "FUNGAL": 0.4285714286,
+      "HERPES": 0.6111111111,
+      "MEL": 0.7419354839,
+      "PSO": 0.1272727273,
+      "SEK": 0.4406779661,
+      "SCC": 0.2142857143,
+      "URT": 0.7435897436,
+      "WARTS": 0.7659574468
+    },
+    "class_top3": {
+      "ACNE": 0.8333333333,
+      "AK": 0.9333333333,
+      "AD": 0.8181818182,
+      "BACT": 0.7692307692,
+      "BCC": 0.95,
+      "CONTACT": 0.6808510638,
+      "ECZEMA": 0.7192982456,
+      "FUNGAL": 0.6785714286,
+      "HERPES": 0.7592592593,
+      "MEL": 0.8709677419,
+      "PSO": 0.6363636364,
+      "SEK": 0.813559322,
+      "SCC": 0.9642857143,
+      "URT": 0.8717948718,
+      "WARTS": 0.8085106383
+    }
+  },
+  "limitations": [
+    "Internal development holdout only; not clinical validation.",
+    "Low Top-1 classes must be interpreted only as Top-k candidates.",
+    "Some sources lack patient identifiers, so patient-level splitting is unavailable for those sources."
+  ]
+}

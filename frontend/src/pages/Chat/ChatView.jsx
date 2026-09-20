@@ -144,7 +144,7 @@ export default function ChatView() {
               </Button>
             }
             style={{ height: '100%' }}
-            bodyStyle={{ padding: 0, overflow: 'auto', maxHeight: 'calc(100% - 56px)' }}
+            styles={{ body: { padding: 0, overflow: 'auto', maxHeight: 'calc(100% - 56px)' } }}
           >
             {sessions.length === 0 ? (
               <EmptyState title="暂无会话" description="点击「新建」开始咨询" />
@@ -190,12 +190,14 @@ export default function ChatView() {
         <Col xs={24} md={18}>
           <Card
             style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-            bodyStyle={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              padding: 0,
-              overflow: 'hidden',
+            styles={{
+              body: {
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                padding: 0,
+                overflow: 'hidden',
+              },
             }}
           >
             {/* Messages */}

@@ -22,6 +22,9 @@ class HealthIndicator(Base):
     )
     name: Mapped[str] = mapped_column(String(50), nullable=False, comment="指标名称")
     value: Mapped[str] = mapped_column(String(50), nullable=False, comment="检测值")
+    statistic_type: Mapped[Optional[str]] = mapped_column(String(20), nullable=True, comment="统计类型")
+    reference_min: Mapped[Optional[float]] = mapped_column(Float, nullable=True, comment="报告参考下限")
+    reference_max: Mapped[Optional[float]] = mapped_column(Float, nullable=True, comment="报告参考上限")
     unit: Mapped[Optional[str]] = mapped_column(String(20), nullable=True, comment="单位")
     normal_range: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, comment="正常范围描述")
     status: Mapped[Optional[str]] = mapped_column(
@@ -46,6 +49,9 @@ class HealthIndicator(Base):
             "category": self.category,
             "name": self.name,
             "value": self.value,
+            "statistic_type": self.statistic_type,
+            "reference_min": self.reference_min,
+            "reference_max": self.reference_max,
             "unit": self.unit,
             "normal_range": self.normal_range,
             "status": self.status,

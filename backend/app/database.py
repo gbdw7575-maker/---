@@ -1,6 +1,6 @@
 """数据库连接与会话管理"""
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 from config import settings
@@ -48,5 +48,15 @@ def get_db():
 
 def init_db():
     """创建所有表"""
-    from app.models import user, health_indicator, chat  # noqa: F401
+    from app.models import user, health_indicator, health_analysis, chat  # noqa: F401
     Base.metadata.create_all(bind=engine)
+    columns = {column["name"] for column in inspect(engine).get_columns("health_indicators")}
+    additions = {
+        "statistic_type": "VARCHAR(20) NULL",
+        "reference_min": "FLOAT NULL",
+        "reference_max": "FLOAT NULL",
+    }
+    with engine.begin() as connection:
+        for name, definition in additions.items():
+            if name not in columns:
+                connection.execute(text(f"ALTER TABLE health_indicators ADD COLUMN {name} {definition}"))

@@ -5,9 +5,13 @@ AI 服务 — 对接 DeepSeek API
 """
 
 from typing import Optional, List, Dict, Any
-from openai import OpenAI
+import logging
+
+from openai import AsyncOpenAI
 
 from config import settings
+
+logger = logging.getLogger(__name__)
 
 # ── 系统提示词 ──
 
@@ -34,13 +38,15 @@ HEALTH_CHAT_SYSTEM_PROMPT = """你是一个贴心的健康管理助手「康康�
 请记住：你的回答仅供参考，不构成医疗诊断。对于疑似严重问题，请提醒用户及时就医。"""
 
 
-def _get_client() -> Optional[OpenAI]:
+def _get_client() -> Optional[AsyncOpenAI]:
     """获取 DeepSeek 客户端"""
     if not settings.DEEPSEEK_API_KEY:
         return None
-    return OpenAI(
+    return AsyncOpenAI(
         api_key=settings.DEEPSEEK_API_KEY,
         base_url=settings.DEEPSEEK_BASE_URL,
+        timeout=90.0,
+        max_retries=1,
     )
 
 
@@ -67,7 +73,7 @@ async def chat_completion(
         return None
 
     try:
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=settings.DEEPSEEK_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -79,7 +85,7 @@ async def chat_completion(
         )
         return response.choices[0].message.content
     except Exception as e:
-        print(f"[AI Service] DeepSeek API 调用失败: {e}")
+        logger.exception("DeepSeek request failed: %s", e)
         return None
 
 
@@ -182,11 +188,27 @@ async def extract_indicators_from_text(raw_text: str) -> Optional[str]:
     Returns:
         格式化后的指标文本（行格式），或 None
     """
-    prompt = f"""请从以下体检报告文本中提取所有关键健康指标。
-以行格式输出，每行一个指标：
-INDICATOR|指标名称|检测值|单位
+    prompt = f"""请从以下体检报告文本中**只提取实际出现**的关键健康指标——
+不存在的指标必须跳过，不得根据常识或常见体检项目猜测或补全。
 
-只提取有临床意义的指标，忽略统计汇总数据、二维码、页码等无关信息。
+可识别的指标类型与常见别名（识别到别名时统一转换为标准中文名）：
+血糖：空腹血糖（葡萄糖、GLU）、餐后2小时血糖、糖化血红蛋白（HbA1c）、随机血糖
+血压：收缩压、舒张压
+血脂：总胆固醇（CHOL、TC）、甘油三酯（TG）、高密度脂蛋白（HDLC、HDL）、低密度脂蛋白（LDLC、LDL）、载脂蛋白A1（ApoA1）、载脂蛋白B（ApoB）、脂蛋白a（Lp(a)）
+肝功能：谷丙转氨酶（ALT）、谷草转氨酶（AST）、总胆红素（TBIL、TB）、直接胆红素（DBIL）、碱性磷酸酶（ALP、AKP）、总蛋白（TP）、白蛋白（ALB）、总胆汁酸（TBA）
+肾功能：肌酐（Cr、CRE）、尿素氮（BUN）、尿酸（UA）
+血常规：白细胞（WBC）、红细胞（RBC）、血红蛋白（HGB、Hb）、血小板（PLT）
+甲状腺功能：促甲状腺激素（TSH）、游离三碘甲状腺原氨酸（FT3）、游离甲状腺素（FT4）、总三碘甲状腺原氨酸（TT3）、总甲状腺素（TT4）
+电解质：钾（K）、钠（Na）、氯（Cl）、钙（Ca）、磷（P）、镁（Mg）
+心血管/心肌酶：肌酸激酶（CK）、肌酸激酶同工酶（CK-MB）、乳酸脱氢酶（LDH）、超敏C反应蛋白（hs-CRP）
+肿瘤标志物：甲胎蛋白（AFP）、癌胚抗原（CEA）、糖类抗原125（CA125）、糖类抗原19-9（CA19-9）
+
+以行格式输出：
+INDICATOR|指标名称|统计类型|检测值|单位|参考下限|参考上限
+
+统计类型只能是 single、min、max、average。报告没有统计类型时使用 single。
+每个统计值使用报告中与该列对应的参考范围；缺失的参考界限留空，不要猜测。
+指标名称使用标准中文名。忽略其他检查项目、说明文字、医院信息、二维码和页码。
 
 文本内容：
 {raw_text}"""

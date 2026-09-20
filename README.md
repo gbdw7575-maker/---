@@ -72,7 +72,7 @@ D:\code\health\
         └── services/            # 业务逻辑层
             ├── rule_engine.py   # 医学规则引擎（6类20项指标）
             ├── ai_service.py    # DeepSeek AI 分析
-            ├── ocr_service.py   # Kimi 视觉 OCR
+            ├── ocr_service.py   # DeepSeek 视觉 OCR
             └── health_service.py # 健康业务编排
 ```
 
@@ -101,6 +101,7 @@ D:\code\health\
 | GET | `/api/health/risk-summary` | 风险评估摘要 |
 | GET | `/api/health/suggestions` | 四维度健康建议 |
 | POST | `/api/health/ai-analyze` | AI 综合分析 |
+| GET | `/api/health/ai-analyses` | 已保存的 AI 分析记录 |
 
 ### AI 健康咨询
 | 方法 | 路径 | 说明 |
@@ -119,7 +120,7 @@ D:\code\health\
 ### 医学影像分类
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| POST | `/api/classify/skin` | 常见皮肤状况图片初筛 |
+| POST | `/api/classify/skin` | 纯本地常见皮肤状况图片初筛 |
 | GET | `/api/classify/classes` | 分类类别列表 |
 | GET | `/api/classify/status` | 模型、许可与运行时状态 |
 
@@ -151,13 +152,13 @@ DATABASE_URL=sqlite:///./health.db
 |------|------|------|
 | 用户档案管理 | — | ✅ 完成 |
 | 健康指标 CRUD | — | ✅ 完成 |
-| 规则引擎（6类20项） | — | ✅ 完成 |
+| 规则引擎（10类47项） | — | ✅ 完成 |
 | 风险评估摘要 | — | ✅ 完成 |
 | 四维度健康建议 | — | ✅ 完成 |
 | AI 综合分析 | DeepSeek API Key | ✅ 完成（需配置） |
 | AI 对话咨询 | DeepSeek API Key | ✅ 完成（需配置） |
-| OCR 体检报告识别 | Kimi API Key | ✅ 完成（需配置） |
-| 皮肤影像初筛 | ONNX Runtime + MobileNetV2 | ✅ 完成（10.35 MB 轻量模型） |
+| OCR 体检报告识别 | DeepSeek API Key | ✅ 完成（需配置） |
+| 皮肤影像初筛 | ONNX Runtime + 本地训练模型 | ✅ 纯本地 15 类，不调用云端识别 |
 | 前端界面 | React + Vite + Ant Design | ✅ 完成 |
 | Docker 部署 | — | 📅 规划中 |
 
@@ -171,8 +172,7 @@ DATABASE_URL=sqlite:///./health.db
 # 数据库
 DATABASE_URL=mysql+pymysql://root:root@localhost:3306/health?charset=utf8mb4
 
-# AI API（不配置则仅规则引擎可用）
-KIMI_API_KEY=your_kimi_api_key_here
+# AI API（不配置则仅规则引擎可用；DeepSeek 同时承担 OCR 与 AI 分析）
 DEEPSEEK_API_KEY=your_deepseek_api_key_here
 ```
 

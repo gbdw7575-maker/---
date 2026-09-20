@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import HealthIndicator, User
+from app.models import HealthAnalysis, HealthIndicator, User
 from app.schemas.health_indicator import (
     HealthIndicatorCreate, HealthIndicatorUpdate,
-    HealthIndicatorResponse, HealthIndicatorBatchCreate,
+    HealthIndicatorResponse, HealthIndicatorBatchCreate, HealthIndicatorBatchDelete,
 )
 from app.services.health_service import (
     create_indicator_with_evaluation,
@@ -17,7 +17,7 @@ from app.services.health_service import (
     generate_health_suggestions,
     get_user_or_default,
 )
-from app.services.rule_engine import CATEGORY_NAMES
+from app.services.rule_engine import ALL_RULES, CATEGORY_NAMES
 
 router = APIRouter(prefix="/api/health", tags=["健康数据"])
 
@@ -64,6 +64,9 @@ def create_indicator(data: HealthIndicatorCreate, db: Session = Depends(get_db))
         name=data.name,
         value=data.value,
         unit=data.unit,
+        statistic_type=data.statistic_type,
+        reference_min=data.reference_min,
+        reference_max=data.reference_max,
         source=data.source or "manual",
         measured_at=data.measured_at,
     )
@@ -82,11 +85,25 @@ def batch_create_indicators(data: HealthIndicatorBatchCreate, db: Session = Depe
             name=item.name,
             value=item.value,
             unit=item.unit,
+            statistic_type=item.statistic_type,
+            reference_min=item.reference_min,
+            reference_max=item.reference_max,
             source=item.source or "manual",
             measured_at=item.measured_at,
         )
         results.append(indicator.to_dict())
     return results
+
+
+@router.delete("/indicators/batch")
+def batch_delete_indicators(data: HealthIndicatorBatchDelete, db: Session = Depends(get_db)):
+    deleted = (
+        db.query(HealthIndicator)
+        .filter(HealthIndicator.id.in_(data.ids))
+        .delete(synchronize_session=False)
+    )
+    db.commit()
+    return {"message": "批量删除成功", "deleted_count": deleted}
 
 
 @router.get("/indicators/{indicator_id}", response_model=HealthIndicatorResponse)
@@ -110,14 +127,23 @@ def update_indicator(indicator_id: int, data: HealthIndicatorUpdate, db: Session
         setattr(indicator, key, value)
 
     # 如果值变了或分类变了，重新评估
-    if "value" in update_data or "name" in update_data:
+    if {"value", "name", "reference_min", "reference_max"} & update_data.keys():
         from app.services.rule_engine import evaluate_indicator
         eval_result = evaluate_indicator(
-            indicator.name, indicator.value, indicator.unit,
+            indicator.name,
+            indicator.value,
+            indicator.unit,
+            indicator.reference_min,
+            indicator.reference_max,
         )
         indicator.status = eval_result.get("status")
         indicator.risk_level = eval_result.get("risk_level")
         indicator.suggestion = eval_result.get("suggestion")
+        from app.services.health_service import _format_reference_range, _get_normal_range
+        indicator.normal_range = (
+            _format_reference_range(indicator.reference_min, indicator.reference_max, indicator.unit)
+            or _get_normal_range(indicator.name)
+        )
 
     db.commit()
     db.refresh(indicator)
@@ -139,7 +165,14 @@ def delete_indicator(indicator_id: int, db: Session = Depends(get_db)):
 def list_categories():
     """获取所有指标分类"""
     return [
-        {"key": k, "name": v}
+        {
+            "key": k,
+            "name": v,
+            "indicators": [
+                {"name": rule.name, "unit": rule.unit}
+                for rule in ALL_RULES.get(k, [])
+            ],
+        }
         for k, v in CATEGORY_NAMES.items()
     ]
 
@@ -208,6 +241,7 @@ async def ai_analyze(
     from app.services.ai_service import analyze_health_indicators
     result = await analyze_health_indicators(indicators_text, user_info)
 
+    source = "ai"
     if result is None:
         # AI 不可用时，使用规则引擎结果
         summary = get_risk_summary(db, user_id)
@@ -223,6 +257,35 @@ async def ai_analyze(
                 for item in items:
                     fallback += f"- {item}\n"
                 fallback += "\n"
-        return {"analysis": fallback, "source": "rule_engine"}
+        result = fallback
+        source = "rule_engine"
 
-    return {"analysis": result, "source": "ai"}
+    saved = HealthAnalysis(
+        user_id=user_id,
+        analysis=result,
+        source=source,
+        indicator_count=len(indicators),
+    )
+    db.add(saved)
+    db.commit()
+    db.refresh(saved)
+    return saved.to_dict()
+
+
+@router.get("/ai-analyses")
+def list_ai_analyses(
+    user_id: Optional[int] = Query(None),
+    limit: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    """获取已保存的健康分析记录，最新结果在前。"""
+    if user_id is None:
+        user_id = get_user_or_default(db).id
+    records = (
+        db.query(HealthAnalysis)
+        .filter(HealthAnalysis.user_id == user_id)
+        .order_by(HealthAnalysis.created_at.desc(), HealthAnalysis.id.desc())
+        .limit(limit)
+        .all()
+    )
+    return [record.to_dict() for record in records]

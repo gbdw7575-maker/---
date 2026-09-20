@@ -1,0 +1,49 @@
+{
+  "count": 15,
+  "top1": 0.8666666666666667,
+  "top3": 1.0,
+  "by_class": {
+    "AD": {
+      "count": 3,
+      "top1": 1.0,
+      "top3": 1.0,
+      "predicted": {
+        "AD": 3
+      }
+    },
+    "BCC": {
+      "count": 3,
+      "top1": 1.0,
+      "top3": 1.0,
+      "predicted": {
+        "BCC": 3
+      }
+    },
+    "ECZEMA": {
+      "count": 3,
+      "top1": 0.6666666666666666,
+      "top3": 1.0,
+      "predicted": {
+        "AD": 1,
+        "ECZEMA": 2
+      }
+    },
+    "MEL": {
+      "count": 3,
+      "top1": 0.6666666666666666,
+      "top3": 1.0,
+      "predicted": {
+        "MEL": 2,
+        "WARTS": 1
+      }
+    },
+    "WARTS": {
+      "count": 3,
+      "top1": 1.0,
+      "top3": 1.0,
+      "predicted": {
+        "WARTS": 3
+      }
+    }
+  }
+}

@@ -49,7 +49,12 @@ BLOOD_FAT_RULES = [
 LIVER_RULES = [
     IndicatorRule("谷丙转氨酶", "liver", "U/L", 0, 40, low_risk_min=40, high_risk_min=80, description="谷丙转氨酶(ALT)"),
     IndicatorRule("谷草转氨酶", "liver", "U/L", 0, 40, low_risk_min=40, high_risk_min=80, description="谷草转氨酶(AST)"),
-    IndicatorRule("总胆红素", "liver", "μmol/L", 3.4, 17.1, low_risk_min=17.1, high_risk_min=34.2, description="总胆红素"),
+    IndicatorRule("总胆红素", "liver", "μmol/L", 3.4, 17.1, low_risk_min=17.1, high_risk_min=34.2, description="总胆红素(TBIL)"),
+    IndicatorRule("直接胆红素", "liver", "μmol/L", 0, 6.8, low_risk_min=6.8, high_risk_min=13.6, description="直接胆红素(DBIL)"),
+    IndicatorRule("碱性磷酸酶", "liver", "U/L", 35, 105, low_risk_min=105, high_risk_min=150, description="碱性磷酸酶(ALP)"),
+    IndicatorRule("总蛋白", "liver", "g/L", 60, 80, low_risk_min=80, high_risk_min=90, description="总蛋白(TP)"),
+    IndicatorRule("白蛋白", "liver", "g/L", 35, 55, low_risk_min=55, high_risk_min=60, description="白蛋白(ALB)"),
+    IndicatorRule("总胆汁酸", "liver", "μmol/L", 0, 10, low_risk_min=10, high_risk_min=20, description="总胆汁酸(TBA)"),
 ]
 
 # ── 肾功能 ──
@@ -67,14 +72,60 @@ BLOOD_ROUTINE_RULES = [
     IndicatorRule("血小板", "blood_routine", "×10⁹/L", 125, 350, low_risk_min=350, high_risk_min=500, description="血小板计数(PLT)"),
 ]
 
+# ── 甲状腺功能 ──
+THYROID_RULES = [
+    IndicatorRule("促甲状腺激素", "thyroid", "mIU/L", 0.27, 4.2, low_risk_min=4.2, high_risk_min=10.0, description="促甲状腺激素(TSH)"),
+    IndicatorRule("游离三碘甲状腺原氨酸", "thyroid", "pmol/L", 3.1, 6.8, low_risk_min=6.8, high_risk_min=9.0, description="游离三碘甲状腺原氨酸(FT3)"),
+    IndicatorRule("游离甲状腺素", "thyroid", "pmol/L", 12.0, 22.0, low_risk_min=22.0, high_risk_min=30.0, description="游离甲状腺素(FT4)"),
+    IndicatorRule("总三碘甲状腺原氨酸", "thyroid", "nmol/L", 0.8, 2.0, low_risk_min=2.0, high_risk_min=3.0, description="总三碘甲状腺原氨酸(TT3)"),
+    IndicatorRule("总甲状腺素", "thyroid", "nmol/L", 5.1, 14.1, low_risk_min=14.1, high_risk_min=19.0, description="总甲状腺素(TT4)"),
+]
+
+# ── 电解质 ──
+ELECTROLYTE_RULES = [
+    IndicatorRule("钾", "electrolyte", "mmol/L", 3.5, 5.3, low_risk_min=5.3, high_risk_min=6.0, description="钾(K)"),
+    IndicatorRule("钠", "electrolyte", "mmol/L", 137, 147, low_risk_min=147, high_risk_min=155, description="钠(Na)"),
+    IndicatorRule("氯", "electrolyte", "mmol/L", 99, 110, low_risk_min=110, high_risk_min=120, description="氯(Cl)"),
+    IndicatorRule("钙", "electrolyte", "mmol/L", 2.2, 2.65, low_risk_min=2.65, high_risk_min=3.0, description="钙(Ca)"),
+    IndicatorRule("磷", "electrolyte", "mmol/L", 0.8, 1.6, low_risk_min=1.6, high_risk_min=2.2, description="磷(P)"),
+    IndicatorRule("镁", "electrolyte", "mmol/L", 0.7, 1.1, low_risk_min=1.1, high_risk_min=1.5, description="镁(Mg)"),
+]
+
+# ── 心血管/心肌酶 ──
+CARDIAC_RULES = [
+    IndicatorRule("肌酸激酶", "cardiac", "U/L", 26, 174, low_risk_min=174, high_risk_min=300, description="肌酸激酶(CK)"),
+    IndicatorRule("肌酸激酶同工酶", "cardiac", "U/L", 0, 25, low_risk_min=25, high_risk_min=50, description="肌酸激酶同工酶(CK-MB)"),
+    IndicatorRule("乳酸脱氢酶", "cardiac", "U/L", 120, 250, low_risk_min=250, high_risk_min=350, description="乳酸脱氢酶(LDH)"),
+    IndicatorRule("超敏C反应蛋白", "cardiac", "mg/L", 0, 3.0, low_risk_min=3.0, high_risk_min=10.0, description="超敏C反应蛋白(hs-CRP)"),
+]
+
+# ── 肿瘤标志物 ──
+TUMOR_MARKER_RULES = [
+    IndicatorRule("甲胎蛋白", "tumor_marker", "ng/mL", 0, 7.0, low_risk_min=7.0, high_risk_min=20.0, description="甲胎蛋白(AFP)"),
+    IndicatorRule("癌胚抗原", "tumor_marker", "ng/mL", 0, 5.0, low_risk_min=5.0, high_risk_min=10.0, description="癌胚抗原(CEA)"),
+    IndicatorRule("糖类抗原125", "tumor_marker", "U/mL", 0, 35, low_risk_min=35, high_risk_min=70, description="糖类抗原125(CA125)"),
+    IndicatorRule("糖类抗原19-9", "tumor_marker", "U/mL", 0, 37, low_risk_min=37, high_risk_min=74, description="糖类抗原19-9(CA19-9)"),
+]
+
+# ── 血脂扩展 ──
+LIPID_EXTENDED_RULES = [
+    IndicatorRule("载脂蛋白A1", "blood_fat", "g/L", 1.0, 1.6, high_risk_max=1.0, description="载脂蛋白A1(ApoA1)"),
+    IndicatorRule("载脂蛋白B", "blood_fat", "g/L", 0.6, 1.1, low_risk_min=1.1, high_risk_min=1.5, description="载脂蛋白B(ApoB)"),
+    IndicatorRule("脂蛋白a", "blood_fat", "mg/L", 0, 300, low_risk_min=300, high_risk_min=500, description="脂蛋白a(Lp(a))"),
+]
+
 # 所有规则索引
 ALL_RULES: Dict[str, List[IndicatorRule]] = {
     "blood_sugar": BLOOD_SUGAR_RULES,
     "blood_pressure": BLOOD_PRESSURE_RULES,
-    "blood_fat": BLOOD_FAT_RULES,
+    "blood_fat": BLOOD_FAT_RULES + LIPID_EXTENDED_RULES,
     "liver": LIVER_RULES,
     "kidney": KIDNEY_RULES,
     "blood_routine": BLOOD_ROUTINE_RULES,
+    "thyroid": THYROID_RULES,
+    "electrolyte": ELECTROLYTE_RULES,
+    "cardiac": CARDIAC_RULES,
+    "tumor_marker": TUMOR_MARKER_RULES,
 }
 
 # 分类中文名
@@ -85,6 +136,10 @@ CATEGORY_NAMES = {
     "liver": "肝功能",
     "kidney": "肾功能",
     "blood_routine": "血常规",
+    "thyroid": "甲状腺功能",
+    "electrolyte": "电解质",
+    "cardiac": "心血管/心肌酶",
+    "tumor_marker": "肿瘤标志物",
 }
 
 
@@ -96,7 +151,9 @@ def _parse_value(value_str: str) -> Optional[float]:
         return None
 
 
-def evaluate_indicator(name: str, value_str: str, unit: Optional[str] = None) -> dict:
+def evaluate_indicator(name: str, value_str: str, unit: Optional[str] = None,
+                       reference_min: Optional[float] = None,
+                       reference_max: Optional[float] = None) -> dict:
     """
     评估单个健康指标。
 
@@ -113,15 +170,25 @@ def evaluate_indicator(name: str, value_str: str, unit: Optional[str] = None) ->
         "suggestion": None,
     }
 
-    # 在所有分类中查找匹配规则
+    # 在所有分类中查找匹配规则（先精确匹配名称，避免子串误匹配，
+    # 例如"血红蛋白"误中"糖化血红蛋白"的描述）
     rule: Optional[IndicatorRule] = None
     for rules in ALL_RULES.values():
         for r in rules:
-            if r.name == name or name in r.description:
+            if r.name == name:
                 rule = r
                 break
         if rule:
             break
+    # 再回退到描述子串匹配
+    if rule is None:
+        for rules in ALL_RULES.values():
+            for r in rules:
+                if name in r.description:
+                    rule = r
+                    break
+            if rule:
+                break
 
     if rule is None:
         return result
@@ -134,9 +201,11 @@ def evaluate_indicator(name: str, value_str: str, unit: Optional[str] = None) ->
     is_high = False
     is_low = False
 
-    if rule.normal_max is not None and value > rule.normal_max:
+    normal_min = reference_min if reference_min is not None else rule.normal_min
+    normal_max = reference_max if reference_max is not None else rule.normal_max
+    if normal_max is not None and value > normal_max:
         is_high = True
-    if rule.normal_min is not None and value < rule.normal_min:
+    if normal_min is not None and value < normal_min:
         is_low = True
 
     if is_high:
@@ -203,6 +272,9 @@ def _get_suggestion(rule: IndicatorRule, status: str, risk_level: Optional[str])
                 "medium": "肝功能指标异常，建议避免饮酒、注意休息、一周后复查。",
                 "low": "肝功能指标轻度异常，注意规律作息、避免劳累。",
             },
+            "abnormal_low": {
+                "medium": "肝功能指标偏低（如总蛋白/白蛋白偏低），可能与营养不良、肝功能减退或蛋白丢失有关，建议加强营养并复查。",
+            },
         },
         "kidney": {
             "abnormal_high": {
@@ -224,6 +296,48 @@ def _get_suggestion(rule: IndicatorRule, status: str, risk_level: Optional[str])
                 "high": "血常规指标显著偏低，建议立即就医血液科排查原因。",
                 "medium": "血常规指标偏低，注意营养补充，建议复查。",
                 "low": "血常规指标轻度偏低，注意均衡饮食。",
+            },
+        },
+        "thyroid": {
+            "abnormal_high": {
+                "high": "甲状腺功能指标显著异常，建议立即就医内分泌科，完善甲状腺彩超和抗体检查。",
+                "medium": "甲状腺功能指标异常，建议复查甲状腺功能全套，必要时内分泌科就诊。",
+                "low": "甲状腺功能指标轻度异常，建议低碘饮食，2-4周后复查。",
+            },
+            "abnormal_low": {
+                "medium": "甲状腺功能指标偏低，建议复查 TSH+FT3+FT4，排查甲状腺功能减退。",
+            },
+        },
+        "electrolyte": {
+            "abnormal_high": {
+                "high": "电解质显著异常（如高钾/高钠），可能危及生命，建议立即就医！",
+                "medium": "电解质异常，建议多饮水、均衡饮食，1-2天内复查。",
+                "low": "电解质轻度异常，注意饮食均衡，多饮水。",
+            },
+            "abnormal_low": {
+                "high": "电解质显著偏低（如低钾），可能引起肌无力或心律失常，建议立即就医！",
+                "medium": "电解质偏低，建议增加富含该元素的食物摄入，1-2天内复查。",
+                "low": "电解质轻度偏低，注意饮食均衡。",
+            },
+        },
+        "cardiac": {
+            "abnormal_high": {
+                "high": "心肌酶/超敏CRP显著升高，可能提示心肌损伤或炎症，建议立即就医心内科！",
+                "medium": "心肌酶或超敏CRP升高，建议复查心电图和心肌酶谱，必要时心内科就诊。",
+                "low": "心肌酶轻度升高，注意休息，避免剧烈运动，2-3天后复查。",
+            },
+            "abnormal_low": {
+                "medium": "心肌酶偏低一般无临床意义，定期体检即可。",
+            },
+        },
+        "tumor_marker": {
+            "abnormal_high": {
+                "high": "肿瘤标志物显著升高，建议尽快就医肿瘤科，完善影像学和病理检查排查肿瘤。",
+                "medium": "肿瘤标志物升高，建议2-4周后复查，如持续升高需进一步检查。",
+                "low": "肿瘤标志物轻度升高，可能为良性疾病或检测误差，建议2-4周后复查。",
+            },
+            "abnormal_low": {
+                "medium": "肿瘤标志物偏低无临床意义，继续定期筛查即可。",
             },
         },
     }

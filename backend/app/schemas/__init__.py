@@ -3,7 +3,7 @@ from app.schemas.user import (
 )
 from app.schemas.health_indicator import (
     HealthIndicatorCreate, HealthIndicatorUpdate, HealthIndicatorResponse,
-    HealthIndicatorBatchCreate,
+    HealthIndicatorBatchCreate, HealthIndicatorBatchDelete,
 )
 from app.schemas.chat import (
     ChatSessionCreate, ChatSessionResponse,
@@ -15,7 +15,7 @@ from app.schemas.ocr import OcrRequest, OcrResponse
 __all__ = [
     "UserCreate", "UserUpdate", "UserResponse",
     "HealthIndicatorCreate", "HealthIndicatorUpdate",
-    "HealthIndicatorResponse", "HealthIndicatorBatchCreate",
+    "HealthIndicatorResponse", "HealthIndicatorBatchCreate", "HealthIndicatorBatchDelete",
     "ChatSessionCreate", "ChatSessionResponse",
     "ChatMessageCreate", "ChatMessageResponse",
     "ChatRequest", "ChatResponse",

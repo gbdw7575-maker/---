@@ -1,0 +1,42 @@
+{
+  "date": "2026-07-19",
+  "inference": "local_only_onnx_ensemble",
+  "classes": ["AD", "BCC", "ECZEMA", "MEL", "WARTS"],
+  "dataset": {
+    "downloaded_candidates": 2209,
+    "deduplicated_images": 1992,
+    "train": 1405,
+    "validation": 298,
+    "test": 289,
+    "split_note": "PAD is patient-grouped; other sources lack patient identifiers and are image-split."
+  },
+  "legacy_mobilenet_v2": {
+    "top1": 0.3529411765,
+    "top3": 0.8442906574
+  },
+  "efficientnet_b0_onnx": {
+    "top1": 0.7889273356,
+    "top3": 0.9861591696,
+    "macro_recall": 0.7837945961,
+    "milliseconds_per_image": 6.5615
+  },
+  "deployed_ensemble": {
+    "efficientnet_weight": 0.85,
+    "mobilenet_v3_weight": 0.15,
+    "top1": 0.7958477509,
+    "top3": 0.9930795848,
+    "macro_recall": 0.7873447638,
+    "class_recall": {
+      "AD": 0.7076923077,
+      "BCC": 0.9866666667,
+      "ECZEMA": 0.671875,
+      "MEL": 0.7741935484,
+      "WARTS": 0.7962962963
+    },
+    "milliseconds_per_image": 12.8643
+  },
+  "limitations": [
+    "This is an internal development holdout, not clinical validation.",
+    "Nine of the previous fifteen smoke-test images overlap with this training/validation data, so that smoke test is not an external accuracy estimate."
+  ]
+}

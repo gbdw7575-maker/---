@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react'
 import {
-  Card, Row, Col, Tag, List, Typography, Progress, Spin, Divider, Alert,
+  Card, Row, Col, Tag, Typography, Progress, Spin, Divider, Space, Button,
 } from 'antd'
-import {
-  SafetyCertificateOutlined, WarningOutlined,
-  CheckCircleOutlined, RiseOutlined,
-} from '@ant-design/icons'
+import { SafetyCertificateOutlined } from '@ant-design/icons'
 import { motion } from 'framer-motion'
 import { healthApi } from '../../api'
 import EmptyState from '../../components/common/EmptyState'
@@ -25,6 +22,11 @@ export default function Assessment() {
   const [loading, setLoading] = useState(true)
   const [risk, setRisk] = useState(null)
   const [indicators, setIndicators] = useState([])
+  const [expandedCategories, setExpandedCategories] = useState({})
+
+  const toggleCategory = (key) => {
+    setExpandedCategories(current => ({ ...current, [key]: !current[key] }))
+  }
 
   useEffect(() => {
     Promise.all([
@@ -38,7 +40,7 @@ export default function Assessment() {
 
   if (loading) return <Spin size="large" style={{ display: 'block', margin: '120px auto' }} />
 
-  if (!risk || indicators.length === 0) {
+  if (!risk || risk.total_count === 0) {
     return (
       <div className="page-enter">
         <EmptyState
@@ -102,6 +104,8 @@ export default function Assessment() {
             const config = categoryConfig[key] || { icon: '📊', color: '#999' }
             const catTotal = indicators.filter(i => i.category === key)
             const catAbnormal = catTotal.filter(i => i.status && i.status.includes('abnormal'))
+            const expanded = !!expandedCategories[key]
+            const visibleAbnormal = expanded ? catAbnormal : catAbnormal.slice(0, 3)
             const isGood = cat.high === 0 && cat.medium === 0
 
             return (
@@ -146,7 +150,7 @@ export default function Assessment() {
                       <>
                         <Divider style={{ margin: '8px 0' }} />
                         <div>
-                          {catAbnormal.slice(0, 3).map(ind => (
+                          {visibleAbnormal.map(ind => (
                             <div key={ind.id} style={{
                               display: 'flex',
                               justifyContent: 'space-between',
@@ -166,9 +170,14 @@ export default function Assessment() {
                             </div>
                           ))}
                           {catAbnormal.length > 3 && (
-                            <Text type="secondary" style={{ fontSize: 12 }}>
-                              ...还有 {catAbnormal.length - 3} 项异常
-                            </Text>
+                            <Button
+                              type="link"
+                              size="small"
+                              style={{ padding: 0, height: 'auto', fontSize: 12 }}
+                              onClick={() => toggleCategory(key)}
+                            >
+                              {expanded ? '收起异常指标' : `还有 ${catAbnormal.length - 3} 项异常，点击查看全部`}
+                            </Button>
                           )}
                         </div>
                       </>

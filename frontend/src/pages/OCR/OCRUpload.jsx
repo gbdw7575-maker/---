@@ -21,6 +21,15 @@ export default function OCRUpload() {
   const [error, setError] = useState(null)
 
   const handleFile = async (file) => {
+    if (!file.type?.startsWith('image/')) {
+      message.error('请选择图片文件')
+      return Upload.LIST_IGNORE
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      message.error('图片不能超过 8 MB')
+      return Upload.LIST_IGNORE
+    }
+
     setLoading(true)
     setError(null)
     setResult(null)
@@ -94,7 +103,7 @@ export default function OCRUpload() {
                 type="info"
                 showIcon
                 message="识别流程"
-                description="Kimi 视觉大模型 OCR → DeepSeek 提取关键指标 → 规则引擎自动评估 → 保存至数据库"
+                description="识别关键指标的单次值、最小值、最大值、平均值及各自参考范围，再分别评估并保存"
               />
 
               {result && (
@@ -168,8 +177,17 @@ export default function OCRUpload() {
                         dataSource={result.indicators}
                         columns={[
                           { title: '名称', dataIndex: 'name', key: 'name' },
+                          {
+                            title: '统计类型', dataIndex: 'statistic_type', key: 'statistic_type',
+                            render: v => ({ min: '最小值', max: '最大值', average: '平均值', single: '单次值' }[v] || '单次值'),
+                          },
                           { title: '数值', dataIndex: 'value', key: 'value' },
                           { title: '单位', dataIndex: 'unit', key: 'unit', render: v => v || '—' },
+                          {
+                            title: '参考范围', key: 'reference',
+                            render: (_, row) => row.reference_min != null || row.reference_max != null
+                              ? `${row.reference_min ?? '—'} - ${row.reference_max ?? '—'}` : '—',
+                          },
                         ]}
                         rowKey="name"
                         size="small"

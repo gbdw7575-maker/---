@@ -7,7 +7,7 @@ import subprocess
 import urllib.request
 from pathlib import Path
 
-from .model import MODEL_PATH, MODEL_SHA256
+from .model import LEGACY_MODEL_PATH, MODEL_SHA256
 
 
 GIT_MODEL_PATH = "backend/app/classifier/weights/skin_disease_mobilenetv2.onnx"
@@ -47,12 +47,12 @@ def main() -> None:
     parser.add_argument("--url", help="Optional public ONNX download URL")
     args = parser.parse_args()
 
-    if verify(MODEL_PATH):
-        print(f"Model is ready: {MODEL_PATH} ({MODEL_PATH.stat().st_size / 1_000_000:.1f} MB)")
+    if verify(LEGACY_MODEL_PATH):
+        print(f"Model is ready: {LEGACY_MODEL_PATH} ({LEGACY_MODEL_PATH.stat().st_size / 1_000_000:.1f} MB)")
         return
 
-    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-    temporary = MODEL_PATH.with_suffix(".onnx.restore")
+    LEGACY_MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temporary = LEGACY_MODEL_PATH.with_suffix(".onnx.restore")
     try:
         if args.url:
             print(f"Downloading model: {args.url}")
@@ -62,8 +62,8 @@ def main() -> None:
             restore_from_git(temporary)
         if not verify(temporary):
             raise RuntimeError("Model SHA-256 verification failed")
-        temporary.replace(MODEL_PATH)
-        print(f"Model restored: {MODEL_PATH} ({MODEL_PATH.stat().st_size / 1_000_000:.1f} MB)")
+        temporary.replace(LEGACY_MODEL_PATH)
+        print(f"Model restored: {LEGACY_MODEL_PATH} ({LEGACY_MODEL_PATH.stat().st_size / 1_000_000:.1f} MB)")
     finally:
         temporary.unlink(missing_ok=True)
 

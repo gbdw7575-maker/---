@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   Card, Table, Button, Tag, Space, Modal, Form, Input, Select,
   DatePicker, message, Row, Col, Statistic, Popconfirm, Tabs,
@@ -34,6 +34,10 @@ const categoryColors = {
   liver: '#52c41a',
   kidney: '#722ed1',
   blood_routine: '#13c2c2',
+  thyroid: '#eb2f96',
+  electrolyte: '#1890ff',
+  cardiac: '#fa541c',
+  tumor_marker: '#531dab',
 }
 
 export default function HealthDashboard() {
@@ -45,6 +49,12 @@ export default function HealthDashboard() {
   const [editing, setEditing] = useState(null)
   const [editForm] = Form.useForm()
   const [activeTab, setActiveTab] = useState('list')
+  const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const [trendCategory, setTrendCategory] = useState('')
+  const [trendDateRange, setTrendDateRange] = useState('30d')
+  const [focusedTrend, setFocusedTrend] = useState(null) // 当前聚焦的指标名
+  const userTouchedTrend = useRef(false)
+  const trendChartRef = useRef(null)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -57,6 +67,12 @@ export default function HealthDashboard() {
       setIndicators(indRes.data)
       setCategories(catRes.data)
       setRiskSummary(riskRes.data)
+      setSelectedRowKeys([])
+      // 首次加载自动选第一个有数据的分类，避免不同单位混 Y 轴
+      if (!userTouchedTrend.current) {
+        const first = catRes.data.find(c => indRes.data.some(i => i.category === c.key))
+        if (first) setTrendCategory(first.key)
+      }
     } catch (err) {
       message.error('加载数据失败')
     } finally {
@@ -73,6 +89,17 @@ export default function HealthDashboard() {
       loadData()
     } catch {
       message.error('删除失败')
+    }
+  }
+
+  const handleBatchDelete = async () => {
+    try {
+      const res = await healthApi.batchDelete(selectedRowKeys)
+      message.success(`已删除 ${res.data.deleted_count} 项指标`)
+      setSelectedRowKeys([])
+      loadData()
+    } catch {
+      message.error('批量删除失败')
     }
   }
 
@@ -100,43 +127,165 @@ export default function HealthDashboard() {
   }
 
   // ── Charts ──
-  const chartData = indicators
-    .filter(i => i.status === 'abnormal_high' || i.status === 'abnormal_low')
-    .slice(0, 10)
 
-  const barOption = {
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    grid: { left: '3%', right: '8%', bottom: '3%', containLabel: true },
-    xAxis: { type: 'category', data: chartData.map(i => i.name), axisLabel: { rotate: 30 } },
-    yAxis: { type: 'value' },
+  // 1. 分类健康概览环形图 — 按分类展示正常/异常/高风险比例
+  const ringCategories = riskSummary?.categories || {}
+  const ringChartData = Object.entries(ringCategories).map(([key, cat]) => ({
+    key,
+    name: cat.name || categories.find(c => c.key === key)?.name || key,
+    total: cat.total || 0,
+    normal: cat.normal || 0,
+    medium: cat.medium || 0,
+    high: cat.high || 0,
+  })).filter(c => c.total > 0)
+
+  const ringOption = (cat) => ({
+    tooltip: { trigger: 'item', formatter: '{b}: {c} 项 ({d}%)' },
+    legend: { bottom: 0, itemWidth: 10, itemHeight: 10, textStyle: { fontSize: 11 } },
+    color: ['#52c41a', '#faad14', '#ff4d4f'],
     series: [{
-      type: 'bar',
-      data: chartData.map(i => ({
-        value: parseFloat(i.value) || 0,
-        itemStyle: {
-          color: i.risk_level === 'high' ? '#ff4d4f'
-            : i.risk_level === 'medium' ? '#faad14' : '#52c41a',
-          borderRadius: [4, 4, 0, 0],
-        },
-      })),
-      barWidth: 30,
+      type: 'pie',
+      radius: ['45%', '70%'],
+      center: ['50%', '45%'],
+      avoidLabelOverlap: true,
+      itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 1 },
+      label: { show: false },
+      data: [
+        { value: cat.normal, name: '正常' },
+        { value: cat.medium, name: '中风险' },
+        { value: cat.high, name: '高风险' },
+      ],
     }],
+  })
+
+  // 2. 指标趋势图
+  // 按分类 + 日期范围筛选
+  const trendCutoff = trendDateRange === 'all' ? null : dayjs().subtract(parseInt(trendDateRange), 'day')
+  const categoryIndicators = indicators
+    .filter(i => !trendCategory || i.category === trendCategory)
+    .filter(i => !trendCutoff || dayjs(i.measured_at || i.created_at).isAfter(trendCutoff))
+  const uniqueNames = [...new Set(categoryIndicators.map(i => i.name))]
+
+  // focusedTrend 变化时，手动触发 ECharts 的 highlight / downplay
+  useEffect(() => {
+    const inst = trendChartRef.current?.getEchartsInstance?.()
+    if (!inst) return
+    if (focusedTrend) {
+      inst.dispatchAction({ type: 'highlight', seriesName: focusedTrend })
+    } else {
+      uniqueNames.forEach(name => inst.dispatchAction({ type: 'downplay', seriesName: name }))
+    }
+  }, [focusedTrend, uniqueNames])
+
+  // 查找指标元信息
+  const getRefRange = (name) => {
+    const ind = indicators.find(i => i.name === name)
+    if (ind?.reference_min != null && ind?.reference_max != null) {
+      return [parseFloat(ind.reference_min), parseFloat(ind.reference_max)]
+    }
+    return null
   }
 
+  // 同名字同日期多个值 → 优先取平均值，否则取平均
+  const pickValueForDate = (name, dateStr) => {
+    const items = indicators.filter(i =>
+      i.name === name
+      && (!trendCategory || i.category === trendCategory)
+      && dayjs(i.measured_at || i.created_at).format('MM-DD') === dateStr
+    )
+    if (items.length === 0) return null
+    const avg = items.find(i => i.stat_type === '平均值')
+    if (avg) return parseFloat(avg.value) || null
+    const vals = items.map(i => parseFloat(i.value)).filter(v => !isNaN(v))
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null
+  }
+
+  // X 轴用唯一日期并集
+  const allDates = [...new Set(
+    categoryIndicators.map(i => dayjs(i.measured_at || i.created_at).format('MM-DD'))
+  )].sort()
+
+  const colors = ['#1677ff', '#ff4d4f', '#faad14', '#52c41a', '#722ed1', '#13c2c2', '#eb2f96', '#fa541c']
+
   const trendOption = {
-    tooltip: { trigger: 'axis' },
-    legend: { data: [...new Set(indicators.map(i => i.name))], bottom: 0 },
-    grid: { left: '3%', right: '4%', bottom: '20%', containLabel: true },
-    xAxis: { type: 'category', data: indicators.map(i => dayjs(i.created_at).format('MM-DD')) },
+    // tooltip: 只显示当天有数据的指标，附带正常范围
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params) => {
+        // 过滤掉 value 为 null 的
+        const valid = params.filter(p => p.value != null)
+        if (valid.length === 0) return ''
+        const date = valid[0].axisValue
+        let html = `<div style="font-weight:600;margin-bottom:4px">${date}</div>`
+        valid.forEach(p => {
+          const ref = p.data?.ref || getRefRange(p.seriesName)
+          const val = p.value
+          let judge = ''
+          if (ref) {
+            judge = val < ref[0]
+              ? `<span style="color:#faad14">⚠️ 偏低</span>`
+              : val > ref[1]
+                ? `<span style="color:#ff4d4f">⚠️ 偏高</span>`
+                : `<span style="color:#52c41a">✓ 正常</span>`
+          }
+          const refStr = ref ? `<br/><span style="color:#888;font-size:11px">正常 ${ref[0]}~${ref[1]}</span>` : ''
+          html += `<div style="margin:4px 0">
+            ${p.marker} <b>${p.seriesName}</b>: ${val} ${refStr} ${judge}
+          </div>`
+        })
+        return html
+      },
+    },
+    legend: {
+      data: uniqueNames,
+      bottom: 0,
+      type: 'scroll',
+      textStyle: { fontSize: 11 },
+    },
+    grid: { left: '3%', right: '4%', bottom: uniqueNames.length > 5 ? '28%' : '15%', top: 30, containLabel: true },
+    xAxis: { type: 'category', data: allDates, axisLabel: { rotate: 30 } },
     yAxis: { type: 'value' },
-    series: [...new Set(indicators.map(i => i.name))].map(name => ({
-      name,
-      type: 'line',
-      smooth: true,
-      data: indicators.filter(i => i.name === name).map(i => parseFloat(i.value) || 0),
-      symbol: 'circle',
-      symbolSize: 6,
-    })),
+    series: uniqueNames.map((name, idx) => {
+      const refRange = getRefRange(name)
+      const color = colors[idx % colors.length]
+      // data 存对象：{ value, ref, name, date } —— tooltip formatter 里可直接取用
+      const data = allDates.map(date => {
+        const val = pickValueForDate(name, date)
+        if (val == null) return null
+        return {
+          value: val,
+          ref: refRange,
+          name,
+          date,
+        }
+      })
+      const isFocused = focusedTrend ? focusedTrend === name : false
+      const isAllDimmed = focusedTrend !== null && !isFocused
+      return {
+        name,
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: isAllDimmed ? 3 : 6,
+        lineStyle: { width: isFocused ? 2.5 : 1.5, opacity: isAllDimmed ? 0.3 : 1 },
+        itemStyle: { color, opacity: isAllDimmed ? 0.3 : 1 },
+        emphasis: { focus: 'series', lineStyle: { width: 3 } },
+        data,
+        // 正常范围参考带：默认隐藏，点击选中后才显示
+        markArea: refRange && isFocused ? {
+          silent: true,
+          itemStyle: { color: 'rgba(82, 196, 26, 0.18)' },
+          label: {
+            show: true,
+            position: 'insideEndTop',
+            formatter: `正常 ${refRange[0]}~${refRange[1]}`,
+            fontSize: 10,
+            color: '#389e0d',
+          },
+          data: [[{ yAxis: refRange[0] }, { yAxis: refRange[1] }]],
+        } : undefined,
+      }
+    }),
   }
 
   // ── Table columns ──
@@ -157,6 +306,13 @@ export default function HealthDashboard() {
           </Tag>
         </span>
       ),
+    },
+    {
+      title: '统计类型',
+      dataIndex: 'statistic_type',
+      key: 'statistic_type',
+      width: 90,
+      render: (type) => ({ min: '最小值', max: '最大值', average: '平均值', single: '单次值' }[type] || '单次值'),
     },
     {
       title: '数值',
@@ -271,6 +427,7 @@ export default function HealthDashboard() {
           <Button icon={<RobotOutlined />} onClick={async () => {
             try {
               const res = await healthApi.aiAnalyze()
+              message.success('分析完成，结果已保存')
               Modal.info({
                 title: 'AI 综合分析',
                 width: 600,
@@ -285,6 +442,15 @@ export default function HealthDashboard() {
             AI 综合分析
           </Button>
           <Button icon={<ReloadOutlined />} onClick={loadData}>刷新</Button>
+          <Popconfirm
+            title={`确认删除已勾选的 ${selectedRowKeys.length} 项指标？`}
+            onConfirm={handleBatchDelete}
+            disabled={selectedRowKeys.length === 0}
+          >
+            <Button danger icon={<DeleteOutlined />} disabled={selectedRowKeys.length === 0}>
+              删除勾选项{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
+            </Button>
+          </Popconfirm>
         </Space>
       </Card>
 
@@ -309,6 +475,7 @@ export default function HealthDashboard() {
                   dataSource={indicators}
                   columns={columns}
                   rowKey="id"
+                  rowSelection={{ selectedRowKeys, onChange: setSelectedRowKeys }}
                   size="middle"
                   pagination={{
                     pageSize: 15,
@@ -324,18 +491,88 @@ export default function HealthDashboard() {
               label: <span><BarChartOutlined /> 图表视图</span>,
               children: (
                 <Row gutter={[16, 16]}>
-                  <Col xs={24} lg={12}>
-                    <Card title="异常指标分布" size="small">
-                      {chartData.length > 0
-                        ? <ReactEChartsCore option={barOption} style={{ height: 300 }} />
-                        : <EmptyState title="暂无异常指标" />}
+                  {/* 分类健康概览 — 环形图网格 */}
+                  <Col xs={24}>
+                    <Card title="分类健康概览（正常 / 中风险 / 高风险）" size="small">
+                      {ringChartData.length > 0 ? (
+                        <Row gutter={[12, 12]}>
+                          {ringChartData.map(cat => (
+                            <Col xs={12} sm={8} md={6} key={cat.key}>
+                              <div style={{ textAlign: 'center' }}>
+                                <ReactEChartsCore
+                                  option={ringOption(cat)}
+                                  style={{ height: 180 }}
+                                  notMerge
+                                />
+                                <div style={{ fontSize: 12, color: '#666', marginTop: -8 }}>
+                                  {cat.name} <span style={{ color: '#999' }}>({cat.total}项)</span>
+                                </div>
+                              </div>
+                            </Col>
+                          ))}
+                        </Row>
+                      ) : (
+                        <EmptyState title="暂无指标数据" description="添加指标后即可查看分类健康概览" />
+                      )}
                     </Card>
                   </Col>
-                  <Col xs={24} lg={12}>
-                    <Card title="指标趋势" size="small">
-                      {indicators.length > 0
-                        ? <ReactEChartsCore option={trendOption} style={{ height: 300 }} />
-                        : <EmptyState title="暂无数据" />}
+
+                  {/* 指标趋势 — 日期 + 分类筛选 */}
+                  <Col xs={24}>
+                    <Card
+                      title="指标趋势"
+                      size="small"
+                      extra={
+                        <Space size={8}>
+                          <Select
+                            value={trendDateRange}
+                            style={{ width: 110 }}
+                            onChange={(v) => setTrendDateRange(v)}
+                            options={[
+                              { value: '7d', label: '近 7 天' },
+                              { value: '30d', label: '近 30 天' },
+                              { value: '90d', label: '近 90 天' },
+                              { value: 'all', label: '全部' },
+                            ]}
+                          />
+                          <Select
+                            placeholder="全部分类"
+                            allowClear
+                            value={trendCategory || undefined}
+                            style={{ width: 130 }}
+                            onChange={(v) => { userTouchedTrend.current = true; setTrendCategory(v || '') }}
+                            options={categories.map(c => ({ value: c.key, label: c.name }))}
+                          />
+                        </Space>
+                      }
+                    >
+                      {uniqueNames.length > 0 ? (
+                        <ReactEChartsCore
+                          ref={trendChartRef}
+                          option={trendOption}
+                          style={{ height: 320 }}
+                          notMerge
+                          onEvents={{
+                            click: (params) => {
+                              if (params.componentType === 'series') {
+                                // 点击折线 → 聚焦 / 再次点击取消
+                                setFocusedTrend(prev => prev === params.seriesName ? null : params.seriesName)
+                              }
+                            },
+                            legendselectchanged: (params) => {
+                              // legend 被点击时：如果只剩 1 个 series 被选中 → 聚焦它；否则取消聚焦
+                              const selected = Object.entries(params.selected).filter(([, v]) => v).map(([k]) => k)
+                              if (selected.length === 1) {
+                                setFocusedTrend(selected[0])
+                              } else {
+                                setFocusedTrend(null)
+                              }
+                            },
+                          }}
+                        />
+                      ) : (
+                        <EmptyState title={indicators.length === 0 ? '暂无数据' : '当前分类无指标'} />
+                      )}
                     </Card>
                   </Col>
                 </Row>
@@ -358,7 +595,7 @@ export default function HealthDashboard() {
         open={!!editing}
         onOk={handleEditSave}
         onCancel={() => setEditing(null)}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={editForm} layout="vertical">
           <Form.Item name="name" label="名称" rules={[{ required: true }]}>

@@ -8,6 +8,10 @@ backend/.env
 __pycache__/
 *.py[cod]
 *.h5
+*.onnx
+*.pth
+*.pt
+.pth
 .venv/
 venv/
 .model-tools/
@@ -27,6 +31,7 @@ node_modules/
 frontend/dist/
 .vite/
 backend/training/data/
+backend/training/.torch/
 
 # Local editor and agent settings
 .claude/settings.local.json

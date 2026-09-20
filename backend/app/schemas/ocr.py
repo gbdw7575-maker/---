@@ -15,6 +15,9 @@ class IndicatorItem(BaseModel):
     value: str = Field(..., description="检测值")
     unit: Optional[str] = Field(None, description="单位")
     category: Optional[str] = Field(None, description="分类")
+    statistic_type: Optional[str] = Field("single", description="single/min/max/average")
+    reference_min: Optional[float] = None
+    reference_max: Optional[float] = None
 
 
 class OcrResponse(BaseModel):

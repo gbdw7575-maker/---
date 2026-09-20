@@ -8,7 +8,7 @@ echo ╚════════════════════════
 echo.
 
 REM ========== 配置路径 ==========
-set MYSQL_DIR=E:\d\MySQL\MySQL Server 8.0
+set MYSQL_DIR=D:\Java\MySQL\MySQL Server 8.0
 set BACKEND_DIR=%~dp0backend
 set FRONTEND_DIR=%~dp0frontend
 set MYSQL_PORT=3306

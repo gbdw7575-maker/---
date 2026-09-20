@@ -23,6 +23,13 @@ const riskMeta = {
   WARTS: { color: '#389e0d', label: '注意防护' },
 }
 
+function getRiskMeta(prediction) {
+  return riskMeta[prediction.class_short]
+    || (prediction.risk_level === 'urgent'
+      ? { color: '#cf1322', label: '尽快就医' }
+      : { color: '#1677ff', label: '建议观察' })
+}
+
 function readFileAsBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -76,7 +83,10 @@ export default function ImageClassify() {
     try {
       const { dataUrl, base64 } = await readFileAsBase64(file)
       setPreview(dataUrl)
-      const response = await classifyApi.classifySkin({ image_base64: base64 }, { topk })
+      const response = await classifyApi.classifySkin(
+        { image_base64: base64 },
+        { topk },
+      )
       setResult(response.data)
       if (response.data.success) {
         message.success('图片分析完成')
@@ -173,9 +183,9 @@ export default function ImageClassify() {
                   type={statusReady ? 'success' : 'error'}
                   showIcon
                   icon={statusReady ? <CheckCircleOutlined /> : <WarningOutlined />}
-                  message={statusReady ? '轻量分类模型可用' : '分类模型尚未安装'}
+                  message={statusReady ? '皮肤影像初筛可用' : '分类模型尚未安装'}
                   description={statusReady
-                    ? `${modelStatus.model_name} · ${modelStatus.model_size_mb} MB · ${modelStatus.runtime}`
+                    ? `${modelStatus.ensemble_enabled ? '纯本地双模型融合' : '纯本地模型'} · ${modelStatus.local_class_count || classes.length} 类可筛查 · 图片不会发送到云端识别`
                     : '请安装 onnxruntime 并运行模型下载脚本。'}
                 />
               )}
@@ -205,13 +215,14 @@ export default function ImageClassify() {
                       <Space direction="vertical" size={6} style={{ width: '100%' }}>
                         <Space wrap>
                           <Title level={5} style={{ margin: 0 }}>{topPrediction.class_name}</Title>
-                          <Tag color={riskMeta[topPrediction.class_short]?.color || 'blue'}>
-                            {riskMeta[topPrediction.class_short]?.label || '参考结果'}
+                          <Tag color={getRiskMeta(topPrediction).color}>
+                            {getRiskMeta(topPrediction).label}
                           </Tag>
+                          <Tag>本地模型</Tag>
                         </Space>
                         <Progress
                           percent={Math.round(topPrediction.probability * 100)}
-                          strokeColor={riskMeta[topPrediction.class_short]?.color || '#1677ff'}
+                          strokeColor={getRiskMeta(topPrediction).color}
                         />
                         <Paragraph style={{ marginBottom: 0 }}>{topPrediction.description}</Paragraph>
                       </Space>
@@ -226,6 +237,7 @@ export default function ImageClassify() {
                             <Space wrap>
                               <Text strong>{item.class_name}</Text>
                               <Tag>{item.class_short}</Tag>
+                              {item.risk_level === 'urgent' && <Tag color="red">尽快就医</Tag>}
                             </Space>
                             <Text type="secondary" style={{ display: 'block', marginTop: 4 }}>
                               {item.description}
@@ -240,10 +252,15 @@ export default function ImageClassify() {
               )}
             </Card>
 
-            <Card title="支持的初筛类别" style={{ marginTop: 16 }}>
+            <Card title={`本地模型支持的初筛类别（${classes.length} 类）`} style={{ marginTop: 16 }}>
               <Descriptions size="small" column={{ xs: 1, sm: 2 }}>
                 {classes.map(item => (
-                  <Descriptions.Item key={item.short} label={item.short}>{item.name}</Descriptions.Item>
+                  <Descriptions.Item key={item.short} label={item.short}>
+                    <Space size={4} wrap>
+                      <span>{item.name}</span>
+                      <Tag color="blue">本地</Tag>
+                    </Space>
+                  </Descriptions.Item>
                 ))}
               </Descriptions>
             </Card>

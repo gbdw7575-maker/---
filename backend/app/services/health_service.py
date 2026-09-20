@@ -31,20 +31,27 @@ def create_indicator_with_evaluation(
     name: str,
     value: str,
     unit: Optional[str] = None,
+    statistic_type: Optional[str] = None,
+    reference_min: Optional[float] = None,
+    reference_max: Optional[float] = None,
     source: str = "manual",
     measured_at: Optional[str] = None,
 ) -> HealthIndicator:
     """创建指标并自动评估"""
     # 规则引擎评估
-    eval_result = evaluate_indicator(name, value, unit)
+    eval_result = evaluate_indicator(name, value, unit, reference_min, reference_max)
+    normal_range = _format_reference_range(reference_min, reference_max, unit) or _get_normal_range(name)
 
     indicator = HealthIndicator(
         user_id=user_id,
         category=category,
         name=name,
         value=value,
+        statistic_type=statistic_type,
+        reference_min=reference_min,
+        reference_max=reference_max,
         unit=unit,
-        normal_range=_get_normal_range(name),
+        normal_range=normal_range,
         status=eval_result.get("status"),
         risk_level=eval_result.get("risk_level"),
         suggestion=eval_result.get("suggestion"),
@@ -55,6 +62,17 @@ def create_indicator_with_evaluation(
     db.commit()
     db.refresh(indicator)
     return indicator
+
+
+def _format_reference_range(minimum, maximum, unit):
+    suffix = f" {unit}" if unit else ""
+    if minimum is not None and maximum is not None:
+        return f"{minimum} - {maximum}{suffix}"
+    if minimum is not None:
+        return f">= {minimum}{suffix}"
+    if maximum is not None:
+        return f"<= {maximum}{suffix}"
+    return None
 
 
 def _get_normal_range(name: str) -> Optional[str]:
@@ -74,9 +92,11 @@ def _get_normal_range(name: str) -> Optional[str]:
 
 def get_risk_summary(db: Session, user_id: int) -> Dict[str, Any]:
     """获取用户健康风险评估摘要"""
-    indicators = db.query(HealthIndicator).filter(
+    all_indicators = db.query(HealthIndicator).filter(
         HealthIndicator.user_id == user_id
     ).all()
+    # Unsupported OCR text has no rule-engine status and must not affect scores.
+    indicators = [indicator for indicator in all_indicators if indicator.status]
 
     # 按分类汇总
     by_category: Dict[str, list] = {}

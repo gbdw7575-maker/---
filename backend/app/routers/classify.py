@@ -11,17 +11,19 @@ from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel, Field
 
 from app.classifier.model import (
-    CLASS_DESCRIPTIONS,
+    ALL_CLASS_DEFINITIONS,
     CLASS_NAMES,
-    CLASS_RISK,
-    CLASS_SHORT,
+    CLASS_PROFILE,
     MODEL_LICENSE,
     MODEL_NAME,
     MODEL_SOURCE,
     MODEL_VERSION,
     ONNX_AVAILABLE,
+    LOCAL_ENSEMBLE_AVAILABLE,
+    ENSEMBLE_PRIMARY_WEIGHT,
     get_classifier,
 )
+from app.classifier.quality import assess_skin_image_quality
 
 router = APIRouter(prefix="/api/classify", tags=["影像分类"])
 classifier = get_classifier()
@@ -68,20 +70,22 @@ async def classify_skin(
     except (UnidentifiedImageError, OSError, ValueError) as exc:
         raise HTTPException(status_code=400, detail="无法读取图片文件") from exc
 
+    quality = assess_skin_image_quality(image)
+    if not quality["acceptable"]:
+        return {
+            "success": False,
+            "predictions": [],
+            "uncertain": True,
+            "notice": "；".join(quality["issues"]),
+            "error": "图片质量不足，暂不进行识别",
+        }
+
     return classifier.predict(image, topk=topk)
 
 
 @router.get("/classes")
 def list_classes():
-    return [
-        {
-            "short": short,
-            "name": name,
-            "description": CLASS_DESCRIPTIONS[short],
-            "risk_level": CLASS_RISK[short],
-        }
-        for short, name in zip(CLASS_SHORT, CLASS_NAMES)
-    ]
+    return ALL_CLASS_DEFINITIONS
 
 
 @router.get("/status")
@@ -100,5 +104,14 @@ def model_status():
         "model_size_mb": round(model_path.stat().st_size / 1_000_000, 1)
         if model_path.is_file()
         else None,
+        "ensemble_size_mb": round(
+            (model_path.stat().st_size + classifier.ensemble_model_path.stat().st_size) / 1_000_000,
+            1,
+        ) if classifier.ensemble_model_path else None,
         "intended_use": "健康教育与初步筛查提示，不用于医疗诊断",
+        "local_class_count": len(CLASS_NAMES),
+        "class_profile": CLASS_PROFILE,
+        "inference_mode": "local_only",
+        "ensemble_enabled": LOCAL_ENSEMBLE_AVAILABLE,
+        "ensemble_primary_weight": ENSEMBLE_PRIMARY_WEIGHT if LOCAL_ENSEMBLE_AVAILABLE else None,
     }

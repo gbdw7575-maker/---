@@ -31,16 +31,18 @@ export default function Dashboard() {
 
   const loadData = async () => {
     try {
-      const [userRes, indRes, riskRes, sugRes] = await Promise.all([
+      const [userRes, indRes, riskRes, sugRes, analysisRes] = await Promise.all([
         userApi.getDefault(),
         healthApi.list(),
         healthApi.riskSummary(),
         healthApi.suggestions(),
+        healthApi.aiAnalyses({ limit: 1 }),
       ])
       setUser(userRes.data)
       setIndicators(indRes.data)
       setRisk(riskRes.data)
       setSuggestions(sugRes.data)
+      setAiAnalysis(analysisRes.data[0] || null)
     } catch (err) {
       console.error('Failed to load dashboard data:', err)
     } finally {
@@ -333,16 +335,23 @@ export default function Dashboard() {
                   showIcon
                 />
               ) : aiAnalysis ? (
-                <div
-                  style={{
-                    maxHeight: 300,
-                    overflow: 'auto',
-                    fontSize: 14,
-                    lineHeight: 1.8,
-                    whiteSpace: 'pre-wrap',
-                  }}
-                  dangerouslySetInnerHTML={{ __html: aiAnalysis.analysis }}
-                />
+                <div>
+                  <div
+                    style={{
+                      maxHeight: 300,
+                      overflow: 'auto',
+                      fontSize: 14,
+                      lineHeight: 1.8,
+                      whiteSpace: 'pre-wrap',
+                    }}
+                  >
+                    {aiAnalysis.analysis}
+                  </div>
+                  <Text type="secondary" style={{ display: 'block', marginTop: 12, fontSize: 12 }}>
+                    已保存 · {aiAnalysis.source === 'ai' ? 'AI 分析' : '规则引擎'}
+                    {aiAnalysis.created_at ? ` · ${new Date(aiAnalysis.created_at).toLocaleString('zh-CN')}` : ''}
+                  </Text>
+                </div>
               ) : (
                 <div style={{ textAlign: 'center', padding: '20px 0', color: '#999' }}>
                   <RobotOutlined style={{ fontSize: 36, display: 'block', marginBottom: 12 }} />
